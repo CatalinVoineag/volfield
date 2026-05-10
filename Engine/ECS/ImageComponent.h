@@ -5,10 +5,7 @@
 #include <optional>
 #include "Component.h"
 #include "../Vec2.h"
-
-enum class ScalingMode {
-  None, Fill, Contain, Cover
-};
+#include "../Blit.h"
 
 class ImageComponent : public Component {
  public:

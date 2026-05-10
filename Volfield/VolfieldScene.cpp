@@ -7,9 +7,8 @@ void VolfieldScene::Load(int Level) {
   Entities.clear();
 
   Entities.emplace_back(std::make_unique<Ship>(*this, true));
-  // SoundEntity = std::make_unique<Entity>(*this);
-  // WinSound = SoundEntity->AddComponent<SoundComponent>("Assets/win.wav");
-  // Entities.emplace_back(std::move(SoundEntity));
+
+  BackgroundSurface = GetAssetManager().LoadSurface("Assets/Background1.png");
 
   // using enum WallPosition;
   // Entities.emplace_back(std::make_unique<Wall>(Top, *this, Entities.size()));

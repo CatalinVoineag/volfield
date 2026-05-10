@@ -4,6 +4,7 @@
 #include "../Engine/Scene.h"
 #include "../Engine/ECS/SoundComponent.h"
 #include "../Engine/Vec2.h"
+#include "../Engine/Blit.h"
 
 class VolfieldScene : public Scene {
 public:
@@ -41,10 +42,27 @@ public:
   void Render(SDL_Surface* Surface, float DeltaTime) {
     const auto* Fmt{SDL_GetPixelFormatDetails(Surface->format)};
 
-    SDL_FillSurfaceRect(
-      Surface, nullptr,
-      SDL_MapRGB(Fmt, nullptr, 20, 50, 20)
-    );
+    if (BackgroundSurface) {
+      BlitInfo Info{
+        CalculateBlitInfo(
+          ScalingMode::None,
+          BackgroundSurface->w, BackgroundSurface->h,
+          0, 0,
+          Surface->w, Surface->h
+        )};
+      if (!SDL_BlitSurfaceScaled(
+        BackgroundSurface.get(), &Info.SourceRect, Surface, &Info.DestRect,
+        SDL_SCALEMODE_LINEAR
+      )) {
+        std::cerr << "Error: Blit failed: "
+          << SDL_GetError() << '\n';
+      }
+    } else {
+      SDL_FillSurfaceRect(
+        Surface, nullptr,
+        SDL_MapRGB(Fmt, nullptr, 20, 50, 20)
+      );
+    }
 
     Scene::Render(Surface, DeltaTime);
   }
@@ -59,4 +77,5 @@ private:
   void Load(int Level);
   SoundComponent* WinSound{nullptr};
   std::unique_ptr<Entity> SoundEntity;
+  SurfacePtr BackgroundSurface;
 };

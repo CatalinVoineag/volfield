@@ -41,6 +41,10 @@ public:
     SDL_UpdateWindowSurface(SDLWindow);
   }
 
+  bool HasMouseFocus() const {
+    return SDL_GetMouseFocus() == SDLWindow;
+  }
+
   SDL_Surface* GetSurface() {
     return SDL_GetWindowSurface(SDLWindow);
   }

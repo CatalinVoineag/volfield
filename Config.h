@@ -16,6 +16,8 @@ inline Uint32 GAME_WON{SDL_RegisterEvents(1)};
 inline Uint32 GAME_LOST{SDL_RegisterEvents(1)};
 inline Uint32 COMPLETE_LEVEL{SDL_RegisterEvents(1)};
 inline Uint32 LAUNCH_LEVEL{SDL_RegisterEvents(1)};
+inline Uint32 MENU_SCENE{SDL_RegisterEvents(1)};
+inline Uint32 GAME_SCENE{SDL_RegisterEvents(1)};
 }
 
 namespace Config {

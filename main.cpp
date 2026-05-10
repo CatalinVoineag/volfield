@@ -2,14 +2,18 @@
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include <iostream>
 #include "Config.h"
 #include "Engine/Window.h"
 #include "Volfield/VolfieldScene.h"
+#include "Volfield/MenuScene.h"
 
 #ifdef WITH_EDITOR
 #include "Editor/Scene.h"
 #include "Editor/Window.h"
 #endif
+
+enum class SceneEnum {GameScene, MenuScene};
 
 int main(int argc, char** argv) {
    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
@@ -22,6 +26,8 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  SceneEnum SceneState = SceneEnum::MenuScene;
+
 #ifdef WITH_EDITOR
   Editor::Window EditorWindow;
   Editor::Scene EditorScene{EditorWindow};
@@ -33,6 +39,7 @@ int main(int argc, char** argv) {
 #endif
   Window GameWindow;
   VolfieldScene GameScene{GameWindow};
+  MenuScene Menu{GameWindow};
 
   Uint64 LastTick{SDL_GetPerformanceCounter()};
   SDL_Event E;
@@ -41,12 +48,25 @@ int main(int argc, char** argv) {
 #ifdef WITH_EDITOR
       EditorScene.HandleEvent(E);
 #endif
-      GameScene.HandleEvent(E);
+
+      if (E.type == UserEvents::GAME_SCENE) {
+        SceneState = SceneEnum::GameScene;
+      } else if (E.type == UserEvents::MENU_SCENE) {
+        SceneState = SceneEnum::MenuScene;
+      }
+
+      if (SceneState == SceneEnum::GameScene) {
+        GameScene.HandleEvent(E);
+      } else if (SceneState == SceneEnum::MenuScene) {
+        Menu.HandleEvent(E);
+      }
+
       if (
         E.type == SDL_EVENT_QUIT ||
         E.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED
       ) {
         GameScene.Cleanup();
+        Menu.Cleanup();
         TTF_Quit();
         SDL_Quit();
         return 0;
@@ -67,9 +87,20 @@ int main(int argc, char** argv) {
     EditorWindow.Update();
 #endif
 
-    GameScene.Tick(DeltaTime);
+    if (SceneState == SceneEnum::GameScene) {
+      GameScene.Tick(DeltaTime);
+    } else if (SceneState == SceneEnum::MenuScene) {
+      Menu.Tick(DeltaTime);
+    }
+
     GameWindow.Render();
-    GameScene.Render(GameWindow.GetSurface(), DeltaTime);
+
+    if (SceneState == SceneEnum::GameScene) {
+      GameScene.Render(GameWindow.GetSurface(), DeltaTime);
+    } else if (SceneState == SceneEnum::MenuScene) {
+      Menu.Render(GameWindow.GetSurface(), DeltaTime);
+    }
+
     GameWindow.Update();
   }
 

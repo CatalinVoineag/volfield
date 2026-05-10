@@ -18,9 +18,11 @@ set(
   "Engine/ECS/src/InputComponent.cpp"
   "Engine/ECS/src/Commands.cpp"
   "Engine/src/Scene.cpp"
+  "Engine/src/Button.cpp"
 
   "Volfield/Ship.cpp"
   "Volfield/VolfieldScene.cpp"
+  "Volfield/MenuScene.cpp"
 )
 
 # Add editor files to the list if WITH_EDITOR is ON

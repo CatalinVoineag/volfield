@@ -26,6 +26,10 @@ public:
     State = NewState;
   }
 
+  bool HasMouseFocus() const {
+    return ParentWindow.HasMouseFocus();
+  }
+
   AssetManager& GetAssetManager();
   SoundAssetManager& GetSoundAssetManager();
   Window& GetWindow() const;

@@ -12,7 +12,7 @@ void MovementCommand::Execute(Entity* Target) {
   if (Physics) {
     Physics->SetVelocity({
       Velocity.x,
-      Physics->GetVelocity().y
+      Velocity.y
     });
   } else {
     std::cerr << "Error: MovementCommand "

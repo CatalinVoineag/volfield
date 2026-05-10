@@ -19,6 +19,8 @@ Ship::Ship(
   Input->UnbindKey(SDLK_SPACE);
   Input->BindKeyHeld(SDLK_A, CreateMoveLeftCommand);
   Input->BindKeyHeld(SDLK_D, CreateMoveRightCommand);
+  Input->BindKeyHeld(SDLK_W, CreateMoveUpCommand);
+  Input->BindKeyHeld(SDLK_S, CreateMoveDownCommand);
 
   Physics = AddComponent<PhysicsComponent>();
   Physics->SetGravity({0.f, 0.f});

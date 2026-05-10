@@ -55,5 +55,18 @@ class Ship : public Entity {
         Vec2{SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0}
       );
     }
+    static CommandPtr CreateMoveUpCommand() {
+      using namespace Config::Volfield;
+      return std::make_unique<MovementCommand>(
+        Vec2{0.0, -SHIP_SPEED * Scene::PIXELS_PER_METER}
+      );
+    }
+
+    static CommandPtr CreateMoveDownCommand() {
+      using namespace Config::Volfield;
+      return std::make_unique<MovementCommand>(
+        Vec2{0.0, SHIP_SPEED * Scene::PIXELS_PER_METER}
+      );
+    }
 };
 

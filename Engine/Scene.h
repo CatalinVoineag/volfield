@@ -45,9 +45,7 @@ public:
     Entities.erase(Entities.begin() + Index);
   }
 
-#ifdef DRAW_DEBUG_HELPERS
   SDL_Surface* Trajectories{nullptr};
-#endif
 
   static inline int PIXELS_PER_METER{50};
   static inline Vec2 GRAVITY{

@@ -9,7 +9,7 @@ public:
     using namespace Config::Engine;
     SDLWindow = SDL_CreateWindow(
       WINDOW_TITLE.c_str(),
-      WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE
+      WINDOW_WIDTH, WINDOW_HEIGHT, 0
     );
   }
 

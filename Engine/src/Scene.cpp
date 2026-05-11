@@ -4,13 +4,11 @@
 
 Scene::Scene(Window& ParentWindow)
   : ParentWindow{ParentWindow} {
-#ifdef DRAW_DEBUG_HELPERS
   Trajectories = SDL_CreateSurface(
     Config::Engine::WINDOW_WIDTH,
     Config::Engine::WINDOW_HEIGHT,
     SDL_PIXELFORMAT_RGBA32
   );
-#endif
 }
 
 void Scene::HandleEvent(const SDL_Event& E) {
@@ -31,13 +29,11 @@ void Scene::Render(SDL_Surface* Surface, float DeltaTime) {
     Entity->Render(Surface, DeltaTime);
   }
 
-#ifdef DRAW_DEBUG_HELPERS
   if (Trajectories) {
     SDL_BlitSurface(
       Trajectories, nullptr, Surface, nullptr
     );
   }
-#endif
 }
 
 AssetManager& Scene::GetAssetManager() {

@@ -11,7 +11,7 @@ Ship::Ship(
     6.f * Scene::PIXELS_PER_METER,
     6.f * Scene::PIXELS_PER_METER
   });
-  Transform->SetScale(1.5f);
+  Transform->SetScale(1.f);
 
   Image = AddComponent<ImageComponent>("Assets/Ship.png");
 

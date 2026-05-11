@@ -27,6 +27,24 @@ class Ship : public Entity {
       Physics->SetVelocity({0, 0});
     }
 
+    void Render(SDL_Surface* Surface, float DeltaTime) {
+
+      auto [x, y]{Transform->GetPosition()};
+      SDL_Rect PositionIndicator{
+        // int(x) - 2, int(y) - 2, 4, 4};
+        int(x), int(y), 4, 4};
+      SDL_FillSurfaceRect(
+        GetScene().Trajectories,
+        &PositionIndicator,
+        SDL_MapRGB(
+          SDL_GetPixelFormatDetails(
+            GetScene().Trajectories->format),
+          nullptr, 255, 0, 0
+        )
+      );
+      Image->Render(Surface, DeltaTime);
+    }
+
     Ship& operator=(const Ship& Other) = delete;
     Ship(const Ship& Other) = delete;
 

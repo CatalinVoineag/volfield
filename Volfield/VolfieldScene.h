@@ -19,12 +19,11 @@ public:
     if (E.type == LAUNCH_LEVEL) {
       Load(E.user.code);
 #ifdef ENABLE_CHEATS
-    else if (
+    } else if (
       E.type == SDL_EVENT_KEY_DOWN &&
       E.key.key == SDLK_C
     ) {
-      CompleteLevel();
-    }
+      // CompleteLevel();
 #endif
     } else if (E.type == GAME_WON) {
       SetState(GameState::Won);
@@ -36,20 +35,35 @@ public:
     ) {
       SetState(GameState::InProgress);
       Load(1);
+    } else if (E.type == SDL_EVENT_KEY_DOWN && E.key.key == SDLK_F) {
+      // Remove tile
+      SDL_Rect cut_rect = { 200, 200, 200, 200 };
+      Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
+
+      SDL_FillSurfaceRect(BackgroundSurface.get(), &cut_rect, transparent);
     }
   }
 
   void Render(SDL_Surface* Surface, float DeltaTime) {
     const auto* Fmt{SDL_GetPixelFormatDetails(Surface->format)};
 
+    int Padding = 40;
+    int SurfaceW = Surface->w - 2 * Padding;
+    int SurfaceH = Surface->h - 2 * Padding;
+
     if (BackgroundSurface) {
+      int Offset = 100;
       BlitInfo Info{
         CalculateBlitInfo(
-          ScalingMode::None,
+          ScalingMode::Fill,
           BackgroundSurface->w, BackgroundSurface->h,
           0, 0,
-          Surface->w, Surface->h
+          SurfaceW, SurfaceH
         )};
+
+      Info.DestRect.x = (Surface->w - Info.DestRect.w) / 2;
+      Info.DestRect.y = (Surface->h - Info.DestRect.h) / 2;
+
       if (!SDL_BlitSurfaceScaled(
         BackgroundSurface.get(), &Info.SourceRect, Surface, &Info.DestRect,
         SDL_SCALEMODE_LINEAR
@@ -70,7 +84,6 @@ public:
   void Tick(float DeltaTime) override {
     Scene::Tick(DeltaTime);
   }
-
 
 private:
   int LoadedLevel{1};

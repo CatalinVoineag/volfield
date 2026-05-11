@@ -27,14 +27,14 @@ set(
 
 # Add editor files to the list if WITH_EDITOR is ON
 if (WITH_EDITOR)
-  list(
-    APPEND SOURCE_FILES
-    "Editor/src/Button.cpp"
-    "Editor/src/Blocks.cpp"
-    "Editor/src/Actor.cpp"
-    "Editor/src/ActorTooltip.cpp"
-    "Editor/src/Level.cpp"
-  )
+  # list(
+  #   APPEND SOURCE_FILES
+  #   "Editor/src/Button.cpp"
+  #   "Editor/src/Blocks.cpp"
+  #   "Editor/src/Actor.cpp"
+  #   "Editor/src/ActorTooltip.cpp"
+  #   "Editor/src/Level.cpp"
+  # )
 endif()
 
 add_executable(volfield ${SOURCE_FILES})
@@ -45,9 +45,9 @@ target_compile_definitions(
 
 if (WITH_EDITOR)
   target_compile_definitions(volfield PUBLIC
-  WITH_EDITOR
+  # WITH_EDITOR
   CHECK_ERRORS
-  # DRAW_DEBUG_HELPERS
+  DRAW_DEBUG_HELPERS
   ENABLE_CHEATS
   )
 endif()

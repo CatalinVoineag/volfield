@@ -1,11 +1,26 @@
 {
   "version": 3,
-  "configurePresets": [{
-    "name": "default",
-    "binaryDir": "build"
-  }],
-  "buildPresets": [{
-    "name": "default",
-    "configurePreset": "default"
-  }]
+  "configurePresets": [
+    {
+      "name": "default",
+      "binaryDir": "build"
+    },
+    {
+      "name": "debug",
+      "binaryDir": "build-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    }
+  ]
 }

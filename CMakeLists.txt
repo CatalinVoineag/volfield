@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD 20)
 project(volfield VERSION 1.0.0)
 
 # Change me to on to enable the editor
-SET(WITH_EDITOR OFF)
+SET(WITH_EDITOR ON)
 
 set(
   SOURCE_FILES

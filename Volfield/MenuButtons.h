@@ -7,15 +7,11 @@ class PlayButton : public Button {
   public:
     constexpr static int WIDTH{100};
     constexpr static int HEIGHT{50};
-    PlayButton(Scene& ParentScene)
+    PlayButton(Scene& ParentScene, int X, int Y)
     : Button {
         ParentScene,
         "PLAY",
-        {
-          static_cast<int>(ParentScene.GetWidth()) - WIDTH,
-          static_cast<int>(ParentScene.GetHeight()) - HEIGHT,
-          WIDTH, HEIGHT
-        }
+        {X, Y, WIDTH, HEIGHT}
       }
     {}
 

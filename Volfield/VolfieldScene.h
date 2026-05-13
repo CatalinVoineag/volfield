@@ -5,6 +5,13 @@
 #include "../Engine/ECS/SoundComponent.h"
 #include "../Engine/Vec2.h"
 #include "../Engine/Blit.h"
+#include "HeaderScene.h"
+#include "LeftSideScene.h"
+#include "RightSideScene.h"
+#include "FooterScene.h"
+
+using ScenePtr = std::unique_ptr<Entity>;
+using ScenePtrs = std::vector<ScenePtr>;
 
 class VolfieldScene : public Scene {
 public:
@@ -45,14 +52,42 @@ public:
   }
 
   void Render(SDL_Surface* Surface, float DeltaTime) {
+    HeaderScene Header{
+      GetWindow(),
+      Config::Engine::WINDOW_WIDTH,
+      100
+    };
+
+    LeftSideScene LeftSide{
+      GetWindow(),
+      100,
+      Config::Engine::WINDOW_HEIGHT,
+      Header.GetHeight()
+    };
+
+    RightSideScene RightSide{
+      GetWindow(),
+      100,
+      Config::Engine::WINDOW_HEIGHT,
+      Header.GetHeight()
+    };
+    FooterScene Footer{
+      GetWindow(),
+      Config::Engine::WINDOW_WIDTH,
+      100
+    };
+
+    Footer.Render(GetWindow().GetSurface(), DeltaTime);
+    LeftSide.Render(GetWindow().GetSurface(), DeltaTime);
+    RightSide.Render(GetWindow().GetSurface(), DeltaTime);
+    Header.Render(GetWindow().GetSurface(), DeltaTime);
+
     const auto* Fmt{SDL_GetPixelFormatDetails(Surface->format)};
 
-    int Padding = 40;
-    int SurfaceW = Surface->w - 2 * Padding;
-    int SurfaceH = Surface->h - 2 * Padding;
+    int SurfaceW = Surface->w - LeftSide.GetWidth() * 2;
+    int SurfaceH = Surface->h - Header.GetHeight();
 
     if (BackgroundSurface) {
-      int Offset = 100;
       BlitInfo Info{
         CalculateBlitInfo(
           ScalingMode::Fill,
@@ -91,4 +126,5 @@ private:
   SoundComponent* WinSound{nullptr};
   std::unique_ptr<Entity> SoundEntity;
   SurfacePtr BackgroundSurface;
+  ScenePtrs Scenes;
 };

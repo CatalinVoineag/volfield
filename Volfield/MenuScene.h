@@ -39,6 +39,11 @@ public:
 
 private:
   void Load();
-  PlayButton PlayBtn{*this};
+  PlayButton PlayBtn{
+    *this,
+    static_cast<int>(GetWidth()),
+    static_cast<int>(GetHeight())
+  };
+
   SettingsButton SettingsBtn{*this};
 };

@@ -17,14 +17,14 @@ class VolfieldScene : public Scene {
 public:
   VolfieldScene(Window& ParentWindow)
     : Scene{ParentWindow} {
-      Load(1);
+      Load(1, ParentWindow);
     }
 
   void HandleEvent(const SDL_Event& E) override {
     Scene::HandleEvent(E);
     using namespace UserEvents;
     if (E.type == LAUNCH_LEVEL) {
-      Load(E.user.code);
+      Load(E.user.code, GetWindow());
 #ifdef ENABLE_CHEATS
     } else if (
       E.type == SDL_EVENT_KEY_DOWN &&
@@ -41,7 +41,7 @@ public:
       E.key.key == SDLK_R
     ) {
       SetState(GameState::InProgress);
-      Load(1);
+      Load(1, GetWindow());
     } else if (E.type == SDL_EVENT_KEY_DOWN && E.key.key == SDLK_F) {
       // Remove tile
       SDL_Rect cut_rect = { 200, 200, 200, 200 };
@@ -52,55 +52,16 @@ public:
   }
 
   void Render(SDL_Surface* Surface, float DeltaTime) {
-    HeaderScene Header{
-      GetWindow(),
-      Surface->w,
-      100
-    };
-
-    LeftSideScene LeftSide{
-      GetWindow(),
-      100,
-      Surface->h,
-      Header.GetHeight()
-    };
-
-    RightSideScene RightSide{
-      GetWindow(),
-      100,
-      Surface->h,
-      Header.GetHeight()
-    };
-    FooterScene Footer{
-      GetWindow(),
-      Surface->w,
-      100
-    };
-
-    Footer.Render(GetWindow().GetSurface(), DeltaTime);
-    LeftSide.Render(GetWindow().GetSurface(), DeltaTime);
-    RightSide.Render(GetWindow().GetSurface(), DeltaTime);
-    Header.Render(GetWindow().GetSurface(), DeltaTime);
+    Footer->Render(GetWindow().GetSurface(), DeltaTime);
+    LeftSide->Render(GetWindow().GetSurface(), DeltaTime);
+    RightSide->Render(GetWindow().GetSurface(), DeltaTime);
+    Header->Render(GetWindow().GetSurface(), DeltaTime);
 
     const auto* Fmt{SDL_GetPixelFormatDetails(Surface->format)};
 
-    int SurfaceW = Surface->w - LeftSide.GetWidth() * 2;
-    int SurfaceH = Surface->h - Header.GetHeight();
-
     if (BackgroundSurface) {
-      BlitInfo Info{
-        CalculateBlitInfo(
-          ScalingMode::Fill,
-          BackgroundSurface->w, BackgroundSurface->h,
-          0, 0,
-          SurfaceW, SurfaceH
-        )};
-
-      Info.DestRect.x = (Surface->w - Info.DestRect.w) / 2;
-      Info.DestRect.y = (Surface->h - Info.DestRect.h) / 2;
-
       if (!SDL_BlitSurfaceScaled(
-        BackgroundSurface.get(), &Info.SourceRect, Surface, &Info.DestRect,
+        BackgroundSurface.get(), &Info->SourceRect, Surface, &Info->DestRect,
         SDL_SCALEMODE_LINEAR
       )) {
         std::cerr << "Error: Blit failed: "
@@ -120,11 +81,20 @@ public:
     Scene::Tick(DeltaTime);
   }
 
+  BlitInfo* GetBlitInfo() {
+    return Info;
+  }
+
 private:
   int LoadedLevel{1};
-  void Load(int Level);
+  void Load(int Level, Window& ParentWindow);
   SoundComponent* WinSound{nullptr};
   std::unique_ptr<Entity> SoundEntity;
   SurfacePtr BackgroundSurface;
   ScenePtrs Scenes;
+  HeaderScene* Header{nullptr};
+  LeftSideScene* LeftSide{nullptr};
+  RightSideScene* RightSide{nullptr};
+  FooterScene* Footer{nullptr};
+  BlitInfo* Info{nullptr};
 };

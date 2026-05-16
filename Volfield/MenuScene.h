@@ -41,8 +41,8 @@ private:
   void Load();
   PlayButton PlayBtn{
     *this,
-    static_cast<int>(GetWidth()),
-    static_cast<int>(GetHeight())
+    static_cast<int>(300),
+    static_cast<int>(300)
   };
 
   SettingsButton SettingsBtn{*this};

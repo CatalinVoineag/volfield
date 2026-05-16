@@ -7,17 +7,16 @@ Ship::Ship(
     bool Paused
     ) : Entity{Scene} {
   Transform = AddComponent<TransformComponent>();
-  Transform->SetPosition({
-    6.f * Scene::PIXELS_PER_METER,
-    6.f * Scene::PIXELS_PER_METER
-  });
   Transform->SetScale(1.f);
-  PreviousXPosition = Transform->GetPosition().x;
-  PreviousYPosition = Transform->GetPosition().y;
 
   Image = AddComponent<ImageComponent>("Assets/Ship.png");
   Width = Image->GetWidth();
   Height = Image->GetHeight();
+
+  Transform->SetPosition({
+    6.f * Scene::PIXELS_PER_METER,
+    static_cast<float>(Scene.GetBlitInfo()->DestRect.h + Height / 2)
+  });
 
   Input = AddComponent<InputComponent>();
   Input->UnbindKey(SDLK_SPACE);
@@ -127,5 +126,3 @@ void Ship::HandleCollision(Entity& Other) {
     );
   }
 }
-
-

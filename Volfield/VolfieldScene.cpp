@@ -3,12 +3,30 @@
 #include "VolfieldScene.h"
 #include "Ship.h"
 
-void VolfieldScene::Load(int Level) {
+void VolfieldScene::Load(int Level, Window& ParentWindow) {
   Entities.clear();
+
+  BackgroundSurface = GetAssetManager().LoadSurface("Assets/Background1.png");
+  Header = new HeaderScene{ ParentWindow, ParentWindow.GetSurface()->w, 100 };
+  LeftSide = new LeftSideScene{ ParentWindow, 100, ParentWindow.GetSurface()->h, Header->GetHeight() };
+  RightSide = new RightSideScene{ ParentWindow, 100, ParentWindow.GetSurface()->h, Header->GetHeight() };
+  Footer = new FooterScene{ ParentWindow, ParentWindow.GetSurface()->w, 100 };
+
+  int SurfaceW = ParentWindow.GetSurface()->w - LeftSide->GetWidth() * 2;
+  int SurfaceH = ParentWindow.GetSurface()->h - Header->GetHeight();
+  Info = new BlitInfo {
+    CalculateBlitInfo(
+      ScalingMode::Fill,
+      BackgroundSurface->w, BackgroundSurface->h,
+      0, 0,
+      SurfaceW, SurfaceH
+    )};
+
+  Info->DestRect.x = (ParentWindow.GetSurface()->w - Info->DestRect.w) / 2;
+  Info->DestRect.y = (ParentWindow.GetSurface()->h - Info->DestRect.h) / 2;
 
   Entities.emplace_back(std::make_unique<Ship>(*this, true));
 
-  BackgroundSurface = GetAssetManager().LoadSurface("Assets/Background1.png");
 
   // using enum WallPosition;
   // Entities.emplace_back(std::make_unique<Wall>(Top, *this, Entities.size()));

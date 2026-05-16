@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <optional>
 #include "../Engine/ECS/Entity.h"
 #include "../Engine/ECS/ImageComponent.h"
@@ -11,6 +12,7 @@
 #include "../Engine/Vec2.h"
 
 class VolfieldScene;
+enum Direction { UP, DOWN, LEFT, RIGHT };
 
 class Ship : public Entity {
   public:
@@ -28,25 +30,52 @@ class Ship : public Entity {
     }
 
     void Render(SDL_Surface* Surface, float DeltaTime) {
+      int DiffX = PreviousXPosition - int(Transform->GetPosition().x);
+      int DiffY = PreviousYPosition - int(Transform->GetPosition().y);
+      if (PreviousYPosition != int(Transform->GetPosition().y)) {
+        std::cout << "Previous " << PreviousYPosition << "\n";
+        std::cout << "Current " << int(Transform->GetPosition().y) << "\n";
+      }
 
-      auto [x, y]{Transform->GetPosition()};
-      SDL_Rect PositionIndicator{
-        // int(x) - 2, int(y) - 2, 4, 4};
-        int(x), int(y), 4, 4};
-      SDL_FillSurfaceRect(
-        GetScene().Trajectories,
-        &PositionIndicator,
-        SDL_MapRGB(
-          SDL_GetPixelFormatDetails(
-            GetScene().Trajectories->format),
-          nullptr, 255, 0, 0
-        )
-      );
+      int lines = std::max(abs(DiffX), abs(DiffY));
+      int iterations = (lines / 4) + 1;
+      std::cout << "iterations " << iterations << "\n";
+
+      if (iterations > 0) {
+        for(int i=0; i < iterations; i++) {
+          int OffsetX = (direction == RIGHT || direction == LEFT) ? i * 4 : 0;
+          int OffsetY = (direction == UP || direction == DOWN) ? i * 4 : 0;
+
+          SDL_Rect PositionIndicator{
+            int(Transform->GetPosition().x + (Width / 2)) + OffsetX,
+            int(Transform->GetPosition().y + (Height / 2)) + OffsetY,
+            4, 4
+          };
+
+          SDL_FillSurfaceRect(
+            GetScene().Trajectories,
+            &PositionIndicator,
+            SDL_MapRGB(
+              SDL_GetPixelFormatDetails(
+                GetScene().Trajectories->format),
+              nullptr, 255, 0, 0
+            )
+          );
+        }
+      } 
+
       Image->Render(Surface, DeltaTime);
+
+      PreviousXPosition = int(Transform->GetPosition().x);
+      PreviousYPosition = int(Transform->GetPosition().y);
     }
 
     Ship& operator=(const Ship& Other) = delete;
     Ship(const Ship& Other) = delete;
+
+    void SetDirection(Direction dir) {
+      direction = dir;
+    }
 
   private:
     TransformComponent* Transform;
@@ -55,32 +84,40 @@ class Ship : public Entity {
     PhysicsComponent* Physics;
     SoundComponent* Sound;
     InputComponent* Input{nullptr};
+    int PreviousXPosition;
+    int PreviousYPosition;
+    Direction direction = UP;
+    int Width;
+    int Height;
 
     void SetIsPaused(bool isPaused) {
       Physics->SetIsEnabled(!isPaused);
       Collision->SetIsEnabled(!isPaused);
     }
 
-    static CommandPtr CreateMoveLeftCommand() {
+    CommandPtr CreateMoveLeftCommand() {
+      SetDirection(LEFT);
       using namespace Config::Volfield;
       return std::make_unique<MovementCommand>(
         Vec2{-SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0}
       );
     }
-    static CommandPtr CreateMoveRightCommand() {
+    CommandPtr CreateMoveRightCommand() {
+      SetDirection(RIGHT);
       using namespace Config::Volfield;
       return std::make_unique<MovementCommand>(
         Vec2{SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0}
       );
     }
-    static CommandPtr CreateMoveUpCommand() {
+    CommandPtr CreateMoveUpCommand() {
+      SetDirection(UP);
       using namespace Config::Volfield;
       return std::make_unique<MovementCommand>(
         Vec2{0.0, -SHIP_SPEED * Scene::PIXELS_PER_METER}
       );
     }
-
-    static CommandPtr CreateMoveDownCommand() {
+    CommandPtr CreateMoveDownCommand() {
+      SetDirection(DOWN);
       using namespace Config::Volfield;
       return std::make_unique<MovementCommand>(
         Vec2{0.0, SHIP_SPEED * Scene::PIXELS_PER_METER}

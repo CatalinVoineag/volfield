@@ -12,11 +12,17 @@ public:
   void Render(SDL_Surface* Surface, float DeltaTime) {
     const auto* Fmt{SDL_GetPixelFormatDetails(Surface->format)};
 
-    SDL_Rect Rect{0, Config::Engine::WINDOW_HEIGHT - Height, Width, Height};
+    SDL_Rect Rect{0, Surface->h - Height, Width, Height};
     SDL_FillSurfaceRect(
       Surface, &Rect,
       SDL_MapRGB(Fmt, nullptr, 0, 0, 0)
     );
+
+  PlayButton PlayBtn{
+    *this,
+    Width/2 - PlayButton::WIDTH / 2,
+    Surface->h - Height / 2
+  };
 
     PlayBtn.Render(Surface);
   }
@@ -31,9 +37,4 @@ public:
 private:
   int Width;
   int Height;
-  PlayButton PlayBtn{
-    *this,
-    Width/2 - PlayButton::WIDTH / 2,
-    Config::Engine::WINDOW_HEIGHT - Height / 2
-  };
 };

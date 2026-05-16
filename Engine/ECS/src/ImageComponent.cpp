@@ -24,8 +24,8 @@ void ImageComponent::Render(SDL_Surface* Surface, float DeltaTime) {
   if (!ImageSurface) return;
 
   auto [TargetX, TargetY]{GetOwnerPosition() + Offset};
-  float TargetW{GetWidth() * GetOwnerScale()};
-  float TargetH{GetHeight() * GetOwnerScale()};
+  float TargetW{GetWidth()};
+  float TargetH{GetHeight()};
 
   int SurfaceW{GetSurfaceWidth()};
   int SurfaceH{GetSurfaceHeight()};
@@ -164,15 +164,10 @@ void ImageComponent::ResetHeight() {
 }
 
 float ImageComponent::GetWidth() const {
-  // If Width has a value, return it.
-  // Otherwise, return surface width.
-  return Width.value_or(GetSurfaceWidth());
+    return Width.value_or(GetSurfaceWidth()) * GetOwnerScale();
 }
-
 float ImageComponent::GetHeight() const {
-  // If Height has a value, return it.
-  // Otherwise, return surface height.
-  return Height.value_or(GetSurfaceHeight());
+    return Height.value_or(GetSurfaceHeight()) * GetOwnerScale();
 }
 
 void ImageComponent::SetScalingMode(ScalingMode Mode) {

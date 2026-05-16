@@ -12,15 +12,19 @@ Ship::Ship(
     6.f * Scene::PIXELS_PER_METER
   });
   Transform->SetScale(1.f);
+  PreviousXPosition = Transform->GetPosition().x;
+  PreviousYPosition = Transform->GetPosition().y;
 
   Image = AddComponent<ImageComponent>("Assets/Ship.png");
+  Width = Image->GetWidth();
+  Height = Image->GetHeight();
 
   Input = AddComponent<InputComponent>();
   Input->UnbindKey(SDLK_SPACE);
-  Input->BindKeyHeld(SDLK_A, CreateMoveLeftCommand);
-  Input->BindKeyHeld(SDLK_D, CreateMoveRightCommand);
-  Input->BindKeyHeld(SDLK_W, CreateMoveUpCommand);
-  Input->BindKeyHeld(SDLK_S, CreateMoveDownCommand);
+  Input->BindKeyHeld(SDLK_A, [this]() { return CreateMoveLeftCommand(); });
+  Input->BindKeyHeld(SDLK_D, [this]() { return CreateMoveRightCommand(); });
+  Input->BindKeyHeld(SDLK_W, [this]() { return CreateMoveUpCommand(); });
+  Input->BindKeyHeld(SDLK_S, [this]() { return CreateMoveDownCommand(); });
 
   Physics = AddComponent<PhysicsComponent>();
   Physics->SetGravity({0.f, 0.f});

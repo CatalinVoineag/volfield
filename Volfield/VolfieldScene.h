@@ -54,26 +54,26 @@ public:
   void Render(SDL_Surface* Surface, float DeltaTime) {
     HeaderScene Header{
       GetWindow(),
-      Config::Engine::WINDOW_WIDTH,
+      Surface->w,
       100
     };
 
     LeftSideScene LeftSide{
       GetWindow(),
       100,
-      Config::Engine::WINDOW_HEIGHT,
+      Surface->h,
       Header.GetHeight()
     };
 
     RightSideScene RightSide{
       GetWindow(),
       100,
-      Config::Engine::WINDOW_HEIGHT,
+      Surface->h,
       Header.GetHeight()
     };
     FooterScene Footer{
       GetWindow(),
-      Config::Engine::WINDOW_WIDTH,
+      Surface->w,
       100
     };
 

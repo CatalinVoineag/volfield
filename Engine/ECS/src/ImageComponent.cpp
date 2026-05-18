@@ -65,6 +65,13 @@ void ImageComponent::DrawDebugHelpers(
   int SurfaceW{GetSurfaceWidth()};
   int SurfaceH{GetSurfaceHeight()};
 
+  std::cout << TargetX << "TargetX\n";
+  std::cout << TargetY << "TargetY\n";
+  std::cout << TargetW << "TargetW\n";
+  std::cout << TargetH << "TargetH\n";
+  std::cout << SurfaceW << "SurfaceW\n";
+  std::cout << SurfaceH << "SurfaceH\n";
+
   // Natural Bounds (Green Outline)
   SDL_Rect NaturalBounds{
     Utilities::Round({

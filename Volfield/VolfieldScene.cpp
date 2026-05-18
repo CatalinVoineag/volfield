@@ -2,6 +2,7 @@
 #include <iostream>
 #include "VolfieldScene.h"
 #include "Ship.h"
+#include "Wall.h"
 
 void VolfieldScene::Load(int Level, Window& ParentWindow) {
   Entities.clear();
@@ -11,6 +12,7 @@ void VolfieldScene::Load(int Level, Window& ParentWindow) {
   LeftSide = new LeftSideScene{ ParentWindow, 100, ParentWindow.GetSurface()->h, Header->GetHeight() };
   RightSide = new RightSideScene{ ParentWindow, 100, ParentWindow.GetSurface()->h, Header->GetHeight() };
   Footer = new FooterScene{ ParentWindow, ParentWindow.GetSurface()->w, 100 };
+
 
   int SurfaceW = ParentWindow.GetSurface()->w - LeftSide->GetWidth() * 2;
   int SurfaceH = ParentWindow.GetSurface()->h - Header->GetHeight();
@@ -25,8 +27,12 @@ void VolfieldScene::Load(int Level, Window& ParentWindow) {
   Info->DestRect.x = (ParentWindow.GetSurface()->w - Info->DestRect.w) / 2;
   Info->DestRect.y = (ParentWindow.GetSurface()->h - Info->DestRect.h) / 2;
 
+  using enum WallPosition;
+  Entities.emplace_back(std::make_unique<Wall>(Top, *this));
+  Entities.emplace_back(std::make_unique<Wall>(Left, *this));
+  Entities.emplace_back(std::make_unique<Wall>(Bottom, *this));
+  Entities.emplace_back(std::make_unique<Wall>(Right, *this));
   Entities.emplace_back(std::make_unique<Ship>(*this, true));
-
 
   // using enum WallPosition;
   // Entities.emplace_back(std::make_unique<Wall>(Top, *this, Entities.size()));

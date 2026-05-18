@@ -18,6 +18,7 @@ inline Uint32 COMPLETE_LEVEL{SDL_RegisterEvents(1)};
 inline Uint32 LAUNCH_LEVEL{SDL_RegisterEvents(1)};
 inline Uint32 MENU_SCENE{SDL_RegisterEvents(1)};
 inline Uint32 GAME_SCENE{SDL_RegisterEvents(1)};
+inline Uint32 CUT{SDL_RegisterEvents(1)};
 }
 
 namespace Config {

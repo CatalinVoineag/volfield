@@ -42,7 +42,7 @@ public:
     ) {
       SetState(GameState::InProgress);
       Load(1, GetWindow());
-    } else if (E.type == SDL_EVENT_KEY_DOWN && E.key.key == SDLK_F) {
+    } else if (E.type == CUT) {
       // Remove tile
       SDL_Rect cut_rect = { 200, 200, 200, 200 };
       Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
@@ -59,7 +59,7 @@ public:
 
     const auto* Fmt{SDL_GetPixelFormatDetails(Surface->format)};
 
-    if (BackgroundSurface) {
+    if (false) {
       if (!SDL_BlitSurfaceScaled(
         BackgroundSurface.get(), &Info->SourceRect, Surface, &Info->DestRect,
         SDL_SCALEMODE_LINEAR

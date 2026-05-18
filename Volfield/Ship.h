@@ -24,9 +24,12 @@ class Ship : public Entity {
     void HandleEvent(const SDL_Event& E) override;
     void HandleCollision(Entity& Other) override;
 
+    std::vector<int> path; 
+
     void Tick(float DeltaTime) override {
       Entity::Tick(DeltaTime);
       Physics->SetVelocity({0, 0});
+      path.emplace_back(int(Transform->GetPosition().y));
     }
 
     void Render(SDL_Surface* Surface, float DeltaTime) {
@@ -65,6 +68,8 @@ class Ship : public Entity {
 
       PreviousXPosition = int(Transform->GetPosition().x);
       PreviousYPosition = int(Transform->GetPosition().y);
+
+      Entity::Render(Surface, DeltaTime);
     }
 
     Ship& operator=(const Ship& Other) = delete;

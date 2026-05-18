@@ -42,6 +42,11 @@ Ship::Ship(
     Image->GetWidth(),
     Image->GetHeight()
   );
+  Collision->SetOffset(
+    // Vec2{static_cast<float>(Width / 2), static_cast<float>(Height / 2)}
+    // Vec2{static_cast<float>(Width / 2), 0}
+    Vec2{static_cast<float>(Width / 2), 0}
+  );
   // Sound = AddComponent<SoundComponent>("Assets/ball_collision.wav");
 
   SetIsPaused(Paused);
@@ -60,17 +65,12 @@ void Ship::HandleEvent(const SDL_Event& E) {
     E.type == UserEvents::GAME_LOST
   ) {
     SetIsPaused(true);
+  // } else if (path.end() >= GetScene().GetBlitInfo()->DestRect.h) {
+  //   std::cout << "CUT \n";
   }
 }
 
 void Ship::HandleCollision(Entity& Other) {
-  // if (!dynamic_cast<Block*>(&Other)) {
-  //   // Sound->Play();
-  // }
-  // if (dynamic_cast<Paddle*>(&Other)) {
-  //   return;
-  // }
-
   SDL_FRect Intersection;
   Collision->GetCollisionRectangle(
     *Other.GetComponent<CollisionComponent>(),

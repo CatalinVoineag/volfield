@@ -65,57 +65,50 @@ void ImageComponent::DrawDebugHelpers(
   int SurfaceW{GetSurfaceWidth()};
   int SurfaceH{GetSurfaceHeight()};
 
-  std::cout << TargetX << "TargetX\n";
-  std::cout << TargetY << "TargetY\n";
-  std::cout << TargetW << "TargetW\n";
-  std::cout << TargetH << "TargetH\n";
-  std::cout << SurfaceW << "SurfaceW\n";
-  std::cout << SurfaceH << "SurfaceH\n";
-
-  // Natural Bounds (Green Outline)
-  SDL_Rect NaturalBounds{
-    Utilities::Round({
-      TargetX, TargetY,
-      SurfaceW * OwnerScale,
-      SurfaceH * OwnerScale
-    })};
-
-  DrawRectOutline(
-    Surface, NaturalBounds,
-    SDL_MapRGB(
-      SDL_GetPixelFormatDetails(Surface->format),
-      nullptr, 0, 255, 0
-    )
-  );
+  // // Natural Bounds (Green Outline)
+  // SDL_Rect NaturalBounds{
+  //   Utilities::Round({
+  //     TargetX, TargetY,
+  //     SurfaceW * OwnerScale,
+  //     SurfaceH * OwnerScale
+  //   })};
+  //
+  // DrawRectOutline(
+  //   Surface, NaturalBounds,
+  //   SDL_MapRGB(
+  //     SDL_GetPixelFormatDetails(Surface->format),
+  //     nullptr, 0, 255, 0
+  //   )
+  // );
 
   // Rendered Bounds (Red Outline)
-  BlitInfo Info{CalculateBlitInfo(
-    ScaleMode,
-    SurfaceW, SurfaceH,
-    TargetX, TargetY,
-    TargetW, TargetH
-  )};
-
-  DrawRectOutline(
-    Surface, Info.DestRect,
-    SDL_MapRGB(
-      SDL_GetPixelFormatDetails(Surface->format),
-      nullptr, 255, 0, 0
-    )
-  );
-
-  // Position marker (Blue Square)
-  SDL_Rect DebugRect{
-    Utilities::Round({
-      TargetX - 5, TargetY - 5, 10, 10})
-  };
-  SDL_FillSurfaceRect(
-    Surface, &DebugRect,
-    SDL_MapRGB(
-      SDL_GetPixelFormatDetails(Surface->format),
-      nullptr, 0, 0, 255
-    )
-  );
+  // BlitInfo Info{CalculateBlitInfo(
+  //   ScaleMode,
+  //   SurfaceW, SurfaceH,
+  //   TargetX, TargetY,
+  //   TargetW, TargetH
+  // )};
+  //
+  // DrawRectOutline(
+  //   Surface, Info.DestRect,
+  //   SDL_MapRGB(
+  //     SDL_GetPixelFormatDetails(Surface->format),
+  //     nullptr, 255, 0, 0
+  //   )
+  // );
+  //
+  // // Position marker (Blue Square)
+  // SDL_Rect DebugRect{
+  //   Utilities::Round({
+  //     TargetX - 5, TargetY - 5, 10, 10})
+  // };
+  // SDL_FillSurfaceRect(
+  //   Surface, &DebugRect,
+  //   SDL_MapRGB(
+  //     SDL_GetPixelFormatDetails(Surface->format),
+  //     nullptr, 0, 0, 255
+  //   )
+  // );
 }
 
 bool ImageComponent::LoadNewImage(

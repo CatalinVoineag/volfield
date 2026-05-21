@@ -14,8 +14,9 @@ Ship::Ship(
   Height = Image->GetHeight();
 
   Transform->SetPosition({
-    6.f * Scene::PIXELS_PER_METER,
-    static_cast<float>(Scene.GetBlitInfo()->DestRect.h + Height / 2)
+    5.f * Scene::PIXELS_PER_METER,
+    5.f * Scene::PIXELS_PER_METER,
+    // static_cast<float>(Scene.GetBlitInfo()->DestRect.h + Height / 2)
   });
 
   Input = AddComponent<InputComponent>();
@@ -38,14 +39,13 @@ Ship::Ship(
   );
 
   Collision = AddComponent<CollisionComponent>();
-  Collision->SetSize(
-    Image->GetWidth(),
-    Image->GetHeight()
-  );
+  float Thickness{.3f * Scene.PIXELS_PER_METER};
+  Collision->SetSize(Thickness, Thickness);
+  // std::cout << "WIDHT " << Width << " HEIGHT " << Height << "\n";
   Collision->SetOffset(
     // Vec2{static_cast<float>(Width / 2), static_cast<float>(Height / 2)}
     // Vec2{static_cast<float>(Width / 2), 0}
-    Vec2{static_cast<float>(Width / 2), 0}
+    Vec2{static_cast<float>((Width - Thickness) / 2), (Height - Thickness) / 2 }
   );
   // Sound = AddComponent<SoundComponent>("Assets/ball_collision.wav");
 
@@ -58,15 +58,12 @@ void Ship::HandleEvent(const SDL_Event& E) {
       E.key.key == SDLK_SPACE &&
       GetScene().GetState() == GameState::InProgress
   ) {
-    std::cout << "here\n";
     SetIsPaused(false);
   } else if (
     E.type == UserEvents::GAME_WON ||
     E.type == UserEvents::GAME_LOST
   ) {
     SetIsPaused(true);
-  // } else if (path.end() >= GetScene().GetBlitInfo()->DestRect.h) {
-  //   std::cout << "CUT \n";
   }
 }
 
@@ -84,45 +81,27 @@ void Ship::HandleCollision(Entity& Other) {
     Intersection.w > Intersection.h
   };
 
-  // 1. Push ball out of the object to prevent sticking
-  Vec2 CurrentPos{Transform->GetPosition()};
-  if (IsVertical) {
-    if (Physics->GetVelocity().y < 0)
-      CurrentPos.y += Intersection.h;
-    else
-      CurrentPos.y -= Intersection.h;
-  } else {
-    if (Physics->GetVelocity().x > 0)
-      CurrentPos.x -= Intersection.w;
-    else
-      CurrentPos.x += Intersection.w;
-  }
-  Transform->SetPosition(CurrentPos);
-
   TransformComponent* OtherTransform{
     Other.GetComponent<TransformComponent>()
   };
 
-  // Calculate relative position to determine the normal
   Vec2 RelativePosition{
     Transform->GetPosition() - OtherTransform->GetPosition()
   };
-
-  Vec2 Normal {
-    IsVertical ? Vec2{0.0f, (RelativePosition.y > 0) ? 1.0f : -1.0f}
-    : Vec2{(RelativePosition.x > 0) ? 1.0f : -1.0f, 0.0f}
-  };
-
-  Vec2 Velocity{Physics->GetVelocity()};
-  // Calculate dot product
-  float DotProduct {
-    Velocity.x * Normal.x + Velocity.y * Normal.y
-  };
-
-  // Only bounce if moving towards the surface
-  if (DotProduct < 0) {
-    Physics->SetVelocity(
-      Velocity - (2 * DotProduct * Normal)
-    );
+  
+  Vec2 CurrentPos{Transform->GetPosition()};
+  if (IsVertical) {
+    if (RelativePosition.y > 0) {
+      CurrentPos.y += Intersection.h;
+    } else {
+      CurrentPos.y -= Intersection.h;
+    }
+  } else {
+    if (RelativePosition.x > 0) {
+      CurrentPos.x += Intersection.w;
+    } else {
+      CurrentPos.x -= Intersection.w;
+    }
   }
+  Transform->SetPosition(CurrentPos);
 }

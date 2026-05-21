@@ -27,17 +27,19 @@ class Wall : public Entity {
       float X = {static_cast<float>(Scene.GetBlitInfo()->DestRect.x)};
       float Y = {static_cast<float>(Scene.GetBlitInfo()->DestRect.y)};
       
-      float Thickness{2.f};
+      // float Thickness{2.f};
+      float Thickness{1.0f * Scene.PIXELS_PER_METER};
+
 
       using enum WallPosition;
       if (Position == Top) {
-        Transform->SetPosition({X, Y});
+        Transform->SetPosition({X, Y - Thickness });
         Collision->SetSize(Width, Thickness);
       } else if (Position == Bottom) {
         Transform->SetPosition({X, Y + Height});
         Collision->SetSize(Width, Thickness);
       } else if (Position == Left) {
-        Transform->SetPosition({X, Y});
+        Transform->SetPosition({X - Thickness, Y});
         Collision->SetSize(Thickness, Height);
       } else if (Position == Right) {
         Transform->SetPosition({X + Width, Y});
@@ -45,17 +47,16 @@ class Wall : public Entity {
       }
     }
 
-  void HandleCollision(Entity& Other) override {
-    auto& GameScene = static_cast<VolfieldScene&>(GetScene());
-    Ship* ShipPtr = dynamic_cast<Ship*>(&Other);
-
-    if (ShipPtr && Position == WallPosition::Top) {
-      std::cout << ShipPtr->path.back() << " BACK\n";
-      SDL_Event E{};
-      E.type = UserEvents::CUT;
-      SDL_PushEvent(&E);
-    }
-  }
+  // void HandleCollision(Entity& Other) override {
+  //   auto& GameScene = static_cast<VolfieldScene&>(GetScene());
+  //   Ship* ShipPtr = dynamic_cast<Ship*>(&Other);
+  //
+  //   if (ShipPtr && Position == WallPosition::Top) {
+  //     SDL_Event E{};
+  //     E.type = UserEvents::CUT;
+  //     SDL_PushEvent(&E);
+  //   }
+  // }
 
   private:
     WallPosition Position;

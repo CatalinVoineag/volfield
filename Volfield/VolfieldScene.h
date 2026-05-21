@@ -59,7 +59,7 @@ public:
 
     const auto* Fmt{SDL_GetPixelFormatDetails(Surface->format)};
 
-    if (false) {
+    if (BackgroundSurface) {
       if (!SDL_BlitSurfaceScaled(
         BackgroundSurface.get(), &Info->SourceRect, Surface, &Info->DestRect,
         SDL_SCALEMODE_LINEAR

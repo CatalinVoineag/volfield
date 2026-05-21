@@ -33,36 +33,36 @@ class Ship : public Entity {
     }
 
     void Render(SDL_Surface* Surface, float DeltaTime) {
-      if (PreviousXPosition.has_value()) {
-        int DiffX = *PreviousXPosition - int(Transform->GetPosition().x);
-        int DiffY = *PreviousYPosition - int(Transform->GetPosition().y);
-
-        int lines = std::max(abs(DiffX), abs(DiffY));
-        int iterations = (lines / 4) + 1;
-
-        if (iterations > 0) {
-          for(int i=0; i < iterations; i++) {
-            int OffsetX = (direction == RIGHT) ? i * 4 : (direction == LEFT) ? -i * 4 : 0;
-            int OffsetY = (direction == DOWN) ? i * 4 : (direction == UP) ? -i * 4 : 0;
-
-            SDL_Rect PositionIndicator{
-              int(Transform->GetPosition().x + (Width / 2)) + OffsetX,
-              int(Transform->GetPosition().y + (Height / 2)) + OffsetY,
-              4, 4
-            };
-
-            SDL_FillSurfaceRect(
-              GetScene().Trajectories,
-              &PositionIndicator,
-              SDL_MapRGB(
-                SDL_GetPixelFormatDetails(
-                  GetScene().Trajectories->format),
-                nullptr, 255, 0, 0
-              )
-            );
-          }
-        } 
-      } 
+      // if (PreviousXPosition.has_value()) {
+      //   int DiffX = *PreviousXPosition - int(Transform->GetPosition().x);
+      //   int DiffY = *PreviousYPosition - int(Transform->GetPosition().y);
+      //
+      //   int lines = std::max(abs(DiffX), abs(DiffY));
+      //   int iterations = (lines / 4) + 1;
+      //
+      //   if (iterations > 0) {
+      //     for(int i=0; i < iterations; i++) {
+      //       int OffsetX = (direction == RIGHT) ? i * 4 : (direction == LEFT) ? -i * 4 : 0;
+      //       int OffsetY = (direction == DOWN) ? i * 4 : (direction == UP) ? -i * 4 : 0;
+      //
+      //       SDL_Rect PositionIndicator{
+      //         int(Transform->GetPosition().x + (Width / 2)) + OffsetX,
+      //         int(Transform->GetPosition().y + (Height / 2)) + OffsetY,
+      //         4, 4
+      //       };
+      //
+      //       SDL_FillSurfaceRect(
+      //         GetScene().Trajectories,
+      //         &PositionIndicator,
+      //         SDL_MapRGB(
+      //           SDL_GetPixelFormatDetails(
+      //             GetScene().Trajectories->format),
+      //           nullptr, 255, 0, 0
+      //         )
+      //       );
+      //     }
+      //   } 
+      // } 
 
       Image->Render(Surface, DeltaTime);
 

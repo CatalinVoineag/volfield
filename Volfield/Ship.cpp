@@ -2,6 +2,21 @@
 #include "VolfieldScene.h"
 #include "Ship.h"
 
+std::ostream& operator<<(std::ostream& os, WallPosition position) {
+    switch (position) {
+        case WallPosition::Top:
+            return os << "Top";
+        case WallPosition::Bottom:
+            return os << "Bottom";
+        case WallPosition::Left:
+            return os << "Left";
+        case WallPosition::Right:
+            return os << "Right";
+    }
+
+    return os << "Unknown";
+}
+
 Ship::Ship(
     VolfieldScene& Scene,
     bool Paused
@@ -15,8 +30,7 @@ Ship::Ship(
 
   Transform->SetPosition({
     5.f * Scene::PIXELS_PER_METER,
-    5.f * Scene::PIXELS_PER_METER,
-    // static_cast<float>(Scene.GetBlitInfo()->DestRect.h + Height / 2)
+    static_cast<float>(Scene.GetBlitInfo()->DestRect.h + Height / 2)
   });
 
   Input = AddComponent<InputComponent>();
@@ -33,19 +47,16 @@ Ship::Ship(
     * Config::Volfield::SHIP_SPEED
     * Scene::PIXELS_PER_METER
   );
-  Physics->ConstrainHorizontalMovement(
-    0,
-    Scene.GetWidth() - Image->GetWidth()
-  );
+  // Physics->ConstrainHorizontalMovement(
+  //   0,
+  //   Scene.GetWidth() - Image->GetWidth()
+  // );
 
   Collision = AddComponent<CollisionComponent>();
   float Thickness{.3f * Scene.PIXELS_PER_METER};
   Collision->SetSize(Thickness, Thickness);
-  // std::cout << "WIDHT " << Width << " HEIGHT " << Height << "\n";
   Collision->SetOffset(
-    // Vec2{static_cast<float>(Width / 2), static_cast<float>(Height / 2)}
-    // Vec2{static_cast<float>(Width / 2), 0}
-    Vec2{static_cast<float>((Width - Thickness) / 2), (Height - Thickness) / 2 }
+    Vec2{static_cast<float>((Width - Thickness) / 2), static_cast<float>((Height - Thickness) / 2) }
   );
   // Sound = AddComponent<SoundComponent>("Assets/ball_collision.wav");
 
@@ -88,6 +99,14 @@ void Ship::HandleCollision(Entity& Other) {
   Vec2 RelativePosition{
     Transform->GetPosition() - OtherTransform->GetPosition()
   };
+
+
+  Wall* WallPtr = dynamic_cast<Wall*>(&Other);
+
+  if (WallPtr) {
+    Position = WallPtr->GetPosition();
+    std::cout << " POSITION " << Position << "\n";
+  }
   
   Vec2 CurrentPos{Transform->GetPosition()};
   if (IsVertical) {

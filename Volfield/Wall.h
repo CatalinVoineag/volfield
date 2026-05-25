@@ -52,11 +52,24 @@ class Wall : public Entity {
   //   Ship* ShipPtr = dynamic_cast<Ship*>(&Other);
   //
   //   if (ShipPtr && Position == WallPosition::Top) {
+  //     // for (int i=0; i < ShipPtr->path.size(); i++) {
+  //     //   std::cout << "BACK " << i << " " << ShipPtr->path[i] << "\n";
+  //     // }
+  //
+  //     std::vector<int> path = ShipPtr->path; 
+  //     auto it = unique(path.begin(), path.end());
+  //
+  //     path.erase(it, path.end());
+  //
   //     SDL_Event E{};
   //     E.type = UserEvents::CUT;
   //     SDL_PushEvent(&E);
   //   }
   // }
+  //
+  WallPosition GetPosition() {
+    return Position;
+  }
 
   private:
     WallPosition Position;

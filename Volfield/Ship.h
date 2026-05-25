@@ -10,6 +10,7 @@
 #include "../Engine/ECS/PhysicsComponent.h"
 #include "../Config.h"
 #include "../Engine/Vec2.h"
+#include "Wall.h"
 
 class VolfieldScene;
 enum Direction { UP, DOWN, LEFT, RIGHT };
@@ -91,6 +92,7 @@ class Ship : public Entity {
     Direction direction = UP;
     int Width;
     int Height;
+    WallPosition Position;
 
     void SetIsPaused(bool isPaused) {
       Physics->SetIsEnabled(!isPaused);
@@ -100,30 +102,53 @@ class Ship : public Entity {
     CommandPtr CreateMoveLeftCommand() {
       SetDirection(LEFT);
       using namespace Config::Volfield;
-      return std::make_unique<MovementCommand>(
-        Vec2{-SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0}
-      );
+
+      Vec2 moveVector;
+      if (Position == WallPosition::Right || Position == WallPosition::Left) {
+        moveVector = {0.0, 0.0};
+      } else {
+        moveVector = {-SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0};
+      }
+
+      return std::make_unique<MovementCommand>(moveVector);
     }
     CommandPtr CreateMoveRightCommand() {
       SetDirection(RIGHT);
       using namespace Config::Volfield;
-      return std::make_unique<MovementCommand>(
-        Vec2{SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0}
-      );
+
+      Vec2 moveVector;
+      if (Position == WallPosition::Right || Position == WallPosition::Left) {
+        moveVector = {0.0, 0.0};
+      } else {
+        moveVector = {SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0};
+      }
+      return std::make_unique<MovementCommand>(moveVector);
     }
     CommandPtr CreateMoveUpCommand() {
       SetDirection(UP);
       using namespace Config::Volfield;
-      return std::make_unique<MovementCommand>(
-        Vec2{0.0, -SHIP_SPEED * Scene::PIXELS_PER_METER}
-      );
+
+      Vec2 moveVector;
+      if (Position == WallPosition::Bottom) {
+        moveVector = {0.0, 0.0};
+      } else {
+        moveVector = {0.0, -SHIP_SPEED * Scene::PIXELS_PER_METER};
+      }
+
+      return std::make_unique<MovementCommand>(moveVector);
     }
     CommandPtr CreateMoveDownCommand() {
       SetDirection(DOWN);
       using namespace Config::Volfield;
-      return std::make_unique<MovementCommand>(
-        Vec2{0.0, SHIP_SPEED * Scene::PIXELS_PER_METER}
-      );
+
+      Vec2 moveVector;
+      if (Position == WallPosition::Top || Position == WallPosition::Bottom) {
+        moveVector = {0.0, 0.0};
+      } else {
+        moveVector = {0.0, SHIP_SPEED * Scene::PIXELS_PER_METER};
+      }
+
+      return std::make_unique<MovementCommand>(moveVector);
     }
 };
 

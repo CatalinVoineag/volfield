@@ -75,6 +75,12 @@ void Ship::HandleEvent(const SDL_Event& E) {
     E.type == UserEvents::GAME_LOST
   ) {
     SetIsPaused(true);
+  } else if (
+      E.type == SDL_EVENT_KEY_DOWN &&
+      E.key.key == SDLK_C &&
+      GetScene().GetState() == GameState::InProgress
+      ) {
+    SetCut(true);
   }
 }
 
@@ -104,8 +110,8 @@ void Ship::HandleCollision(Entity& Other) {
   Wall* WallPtr = dynamic_cast<Wall*>(&Other);
 
   if (WallPtr) {
-    Position = WallPtr->GetPosition();
-    std::cout << " POSITION " << Position << "\n";
+    SetCut(false);
+    directions.push_back(WallPtr->GetPosition());
   }
   
   Vec2 CurrentPos{Transform->GetPosition()};
@@ -123,4 +129,5 @@ void Ship::HandleCollision(Entity& Other) {
     }
   }
   Transform->SetPosition(CurrentPos);
+  Collision->RefreshBounds();
 }

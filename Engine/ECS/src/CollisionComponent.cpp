@@ -14,6 +14,16 @@ void CollisionComponent::Tick(float DeltaTime) {
   Bounds.h = Height * OwnerScale;
 }
 
+void CollisionComponent::RefreshBounds() {
+  Vec2 OwnerPos{GetOwnerPosition()};
+  float OwnerScale{GetOwnerScale()};
+
+  Bounds.x = OwnerPos.x + Offset.x;
+  Bounds.y = OwnerPos.y + Offset.y;
+  Bounds.w = Width * OwnerScale;
+  Bounds.h = Height * OwnerScale;
+}
+
 void CollisionComponent::Initialize() {
   if (!GetOwner()->GetComponent<TransformComponent>()) {
     std::cerr << "Error: CollisionComponent "

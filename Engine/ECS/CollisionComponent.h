@@ -31,6 +31,7 @@ class CollisionComponent : public Component {
   ) const;
 
   void Tick(float DeltaTime) override;
+  void RefreshBounds();
   void Initialize() override;
   void DrawDebugHelpers(SDL_Surface*) override;
 

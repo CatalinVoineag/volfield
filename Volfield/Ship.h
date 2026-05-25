@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <optional>
+#include <vector>
 #include "../Engine/ECS/Entity.h"
 #include "../Engine/ECS/ImageComponent.h"
 #include "../Engine/ECS/SoundComponent.h"
@@ -30,40 +31,41 @@ class Ship : public Entity {
     void Tick(float DeltaTime) override {
       Entity::Tick(DeltaTime);
       Physics->SetVelocity({0, 0});
+      directions.clear();
       path.emplace_back(int(Transform->GetPosition().y));
     }
 
     void Render(SDL_Surface* Surface, float DeltaTime) {
-      // if (PreviousXPosition.has_value()) {
-      //   int DiffX = *PreviousXPosition - int(Transform->GetPosition().x);
-      //   int DiffY = *PreviousYPosition - int(Transform->GetPosition().y);
-      //
-      //   int lines = std::max(abs(DiffX), abs(DiffY));
-      //   int iterations = (lines / 4) + 1;
-      //
-      //   if (iterations > 0) {
-      //     for(int i=0; i < iterations; i++) {
-      //       int OffsetX = (direction == RIGHT) ? i * 4 : (direction == LEFT) ? -i * 4 : 0;
-      //       int OffsetY = (direction == DOWN) ? i * 4 : (direction == UP) ? -i * 4 : 0;
-      //
-      //       SDL_Rect PositionIndicator{
-      //         int(Transform->GetPosition().x + (Width / 2)) + OffsetX,
-      //         int(Transform->GetPosition().y + (Height / 2)) + OffsetY,
-      //         4, 4
-      //       };
-      //
-      //       SDL_FillSurfaceRect(
-      //         GetScene().Trajectories,
-      //         &PositionIndicator,
-      //         SDL_MapRGB(
-      //           SDL_GetPixelFormatDetails(
-      //             GetScene().Trajectories->format),
-      //           nullptr, 255, 0, 0
-      //         )
-      //       );
-      //     }
-      //   } 
-      // } 
+      if (PreviousXPosition.has_value() && Cut) {
+        int DiffX = *PreviousXPosition - int(Transform->GetPosition().x);
+        int DiffY = *PreviousYPosition - int(Transform->GetPosition().y);
+
+        int lines = std::max(abs(DiffX), abs(DiffY));
+        int iterations = (lines / 4) + 1;
+
+        if (iterations > 0) {
+          for(int i=0; i < iterations; i++) {
+            int OffsetX = (direction == RIGHT) ? i * 4 : (direction == LEFT) ? -i * 4 : 0;
+            int OffsetY = (direction == DOWN) ? i * 4 : (direction == UP) ? -i * 4 : 0;
+
+            SDL_Rect PositionIndicator{
+              int(Transform->GetPosition().x + (Width / 2)) + OffsetX,
+              int(Transform->GetPosition().y + (Height / 2)) + OffsetY,
+              4, 4
+            };
+
+            SDL_FillSurfaceRect(
+              GetScene().Trajectories,
+              &PositionIndicator,
+              SDL_MapRGB(
+                SDL_GetPixelFormatDetails(
+                  GetScene().Trajectories->format),
+                nullptr, 255, 0, 0
+              )
+            );
+          }
+        } 
+      } 
 
       Image->Render(Surface, DeltaTime);
 
@@ -80,6 +82,10 @@ class Ship : public Entity {
       direction = dir;
     }
 
+    void SetCut(bool cut) {
+      Cut = cut;
+    }
+
   private:
     TransformComponent* Transform;
     ImageComponent* Image;
@@ -92,7 +98,28 @@ class Ship : public Entity {
     Direction direction = UP;
     int Width;
     int Height;
-    WallPosition Position;
+    std::vector<WallPosition> directions;
+    bool Cut = false;
+
+    bool MoveLeftOrRight() {
+      if (Cut) { return true; }
+
+      for (auto w : directions) {
+        if (w == WallPosition::Top || w == WallPosition::Bottom)
+          return true;
+      }
+      return false;
+    }
+
+    bool MoveUpOrDown() {
+      if (Cut) { return true; }
+
+      for (auto w : directions) {
+        if (w == WallPosition::Left || w == WallPosition::Right)
+          return true;
+      }
+      return false;
+    }
 
     void SetIsPaused(bool isPaused) {
       Physics->SetIsEnabled(!isPaused);
@@ -104,10 +131,10 @@ class Ship : public Entity {
       using namespace Config::Volfield;
 
       Vec2 moveVector;
-      if (Position == WallPosition::Right || Position == WallPosition::Left) {
-        moveVector = {0.0, 0.0};
-      } else {
+      if (MoveLeftOrRight()) {
         moveVector = {-SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0};
+      } else {
+        moveVector = {0.0, 0.0};
       }
 
       return std::make_unique<MovementCommand>(moveVector);
@@ -116,11 +143,12 @@ class Ship : public Entity {
       SetDirection(RIGHT);
       using namespace Config::Volfield;
 
+
       Vec2 moveVector;
-      if (Position == WallPosition::Right || Position == WallPosition::Left) {
-        moveVector = {0.0, 0.0};
-      } else {
+      if (MoveLeftOrRight()) {
         moveVector = {SHIP_SPEED * Scene::PIXELS_PER_METER, 0.0};
+      } else {
+        moveVector = {0.0, 0.0};
       }
       return std::make_unique<MovementCommand>(moveVector);
     }
@@ -129,10 +157,10 @@ class Ship : public Entity {
       using namespace Config::Volfield;
 
       Vec2 moveVector;
-      if (Position == WallPosition::Bottom) {
-        moveVector = {0.0, 0.0};
-      } else {
+      if (MoveUpOrDown()) {
         moveVector = {0.0, -SHIP_SPEED * Scene::PIXELS_PER_METER};
+      } else {
+        moveVector = {0.0, 0.0};
       }
 
       return std::make_unique<MovementCommand>(moveVector);
@@ -142,10 +170,10 @@ class Ship : public Entity {
       using namespace Config::Volfield;
 
       Vec2 moveVector;
-      if (Position == WallPosition::Top || Position == WallPosition::Bottom) {
-        moveVector = {0.0, 0.0};
-      } else {
+      if (MoveUpOrDown()) {
         moveVector = {0.0, SHIP_SPEED * Scene::PIXELS_PER_METER};
+      } else {
+        moveVector = {0.0, 0.0};
       }
 
       return std::make_unique<MovementCommand>(moveVector);

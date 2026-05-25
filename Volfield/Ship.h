@@ -26,46 +26,58 @@ class Ship : public Entity {
     void HandleEvent(const SDL_Event& E) override;
     void HandleCollision(Entity& Other) override;
 
-    std::vector<int> path; 
-
     void Tick(float DeltaTime) override {
       Entity::Tick(DeltaTime);
       Physics->SetVelocity({0, 0});
       directions.clear();
-      path.emplace_back(int(Transform->GetPosition().y));
+
+      const bool* CurrentKeyStates{
+        SDL_GetKeyboardState(nullptr)};
+      SDL_Scancode Scancode{SDL_GetScancodeFromKey(SDLK_C, nullptr)};
+
+      if (CurrentKeyStates[Scancode]) {
+        SetCut(true);
+      }
     }
 
     void Render(SDL_Surface* Surface, float DeltaTime) {
-      if (PreviousXPosition.has_value() && Cut) {
+      // This should start drawing from the colision box
+      // in the middle of the ship
+      if (PreviousXPosition.has_value() && Cut && directions.size() == 0) {
         int DiffX = *PreviousXPosition - int(Transform->GetPosition().x);
         int DiffY = *PreviousYPosition - int(Transform->GetPosition().y);
 
         int lines = std::max(abs(DiffX), abs(DiffY));
         int iterations = (lines / 4) + 1;
 
-        if (iterations > 0) {
-          for(int i=0; i < iterations; i++) {
-            int OffsetX = (direction == RIGHT) ? i * 4 : (direction == LEFT) ? -i * 4 : 0;
-            int OffsetY = (direction == DOWN) ? i * 4 : (direction == UP) ? -i * 4 : 0;
-
-            SDL_Rect PositionIndicator{
-              int(Transform->GetPosition().x + (Width / 2)) + OffsetX,
-              int(Transform->GetPosition().y + (Height / 2)) + OffsetY,
+        for(int i = 0; i <= iterations; i++) {
+          float t = float(i) / iterations;
+          SDL_Rect PositionIndicator{
+            int(*PreviousXPosition - DiffX * t + Width / 2),
+              int(*PreviousYPosition - DiffY * t + Height / 2),
               4, 4
-            };
+          };
 
-            SDL_FillSurfaceRect(
-              GetScene().Trajectories,
-              &PositionIndicator,
-              SDL_MapRGB(
-                SDL_GetPixelFormatDetails(
-                  GetScene().Trajectories->format),
-                nullptr, 255, 0, 0
-              )
-            );
-          }
+          path.emplace_back(int(PositionIndicator.y)+4);
+          std::cout << "PATH " << path.back() << "\n";
+          path.emplace_back(int(PositionIndicator.y)+3);
+          std::cout << "PATH " << path.back() << "\n";
+          path.emplace_back(int(PositionIndicator.y)+2);
+          std::cout << "PATH " << path.back() << "\n";
+          path.emplace_back(int(PositionIndicator.y)+1);
+          std::cout << "PATH " << path.back() << "\n";
+
+          SDL_FillSurfaceRect(
+            GetScene().Trajectories,
+            &PositionIndicator,
+            SDL_MapRGB(
+              SDL_GetPixelFormatDetails(
+                GetScene().Trajectories->format),
+              nullptr, 255, 0, 0
+            )
+          );
         } 
-      } 
+      }
 
       Image->Render(Surface, DeltaTime);
 
@@ -86,6 +98,14 @@ class Ship : public Entity {
       Cut = cut;
     }
 
+    std::vector<int> GetPath() {
+      return path;
+    }
+
+    TransformComponent* GetTransform() {
+      return Transform;
+    }
+
   private:
     TransformComponent* Transform;
     ImageComponent* Image;
@@ -100,6 +120,7 @@ class Ship : public Entity {
     int Height;
     std::vector<WallPosition> directions;
     bool Cut = false;
+    std::vector<int> path; 
 
     bool MoveLeftOrRight() {
       if (Cut) { return true; }

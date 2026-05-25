@@ -10,6 +10,8 @@ enum class WallPosition {
   Top, Bottom, Left, Right
 };
 
+class VolfieldScene;
+
 class Wall : public Entity {
  public:
   Wall(WallPosition Position, VolfieldScene& Scene)

@@ -10,6 +10,8 @@
 #include "RightSideScene.h"
 #include "FooterScene.h"
 
+class Ship;
+
 using ScenePtr = std::unique_ptr<Entity>;
 using ScenePtrs = std::vector<ScenePtr>;
 
@@ -43,11 +45,7 @@ public:
       SetState(GameState::InProgress);
       Load(1, GetWindow());
     } else if (E.type == CUT) {
-      // Remove tile
-      SDL_Rect cut_rect = { 200, 200, 200, 200 };
-      Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
-
-      SDL_FillSurfaceRect(BackgroundSurface.get(), &cut_rect, transparent);
+      HandleCutEvent(E);
     }
   }
 
@@ -84,6 +82,8 @@ public:
   BlitInfo* GetBlitInfo() {
     return Info;
   }
+
+  void HandleCutEvent(const SDL_Event& E);
 
 private:
   int LoadedLevel{1};

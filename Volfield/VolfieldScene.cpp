@@ -80,3 +80,19 @@ void VolfieldScene::Load(int Level, Window& ParentWindow) {
   SetState(GameState::InProgress);
 }
 
+void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
+  Ship* ship = static_cast<Ship*>(E.user.data1);
+  // if (ship->GetPath().size() > 0) {
+  //   std::cout << ship->GetPath().back() << " this \n";
+  // }
+
+  SDL_Rect cut_rect = {
+    ship->GetTransform()->GetPosition().x,
+    ship->GetTransform()->GetPosition().y,
+    ship->GetTransform()->GetPosition().x,
+    Info->DestRect.h
+  };
+  Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
+
+  SDL_FillSurfaceRect(BackgroundSurface.get(), &cut_rect, transparent);
+}

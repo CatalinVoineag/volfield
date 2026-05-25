@@ -47,10 +47,6 @@ Ship::Ship(
     * Config::Volfield::SHIP_SPEED
     * Scene::PIXELS_PER_METER
   );
-  // Physics->ConstrainHorizontalMovement(
-  //   0,
-  //   Scene.GetWidth() - Image->GetWidth()
-  // );
 
   Collision = AddComponent<CollisionComponent>();
   float Thickness{.3f * Scene.PIXELS_PER_METER};
@@ -75,12 +71,6 @@ void Ship::HandleEvent(const SDL_Event& E) {
     E.type == UserEvents::GAME_LOST
   ) {
     SetIsPaused(true);
-  } else if (
-      E.type == SDL_EVENT_KEY_DOWN &&
-      E.key.key == SDLK_C &&
-      GetScene().GetState() == GameState::InProgress
-      ) {
-    SetCut(true);
   }
 }
 
@@ -106,11 +96,24 @@ void Ship::HandleCollision(Entity& Other) {
     Transform->GetPosition() - OtherTransform->GetPosition()
   };
 
-
   Wall* WallPtr = dynamic_cast<Wall*>(&Other);
 
   if (WallPtr) {
-    SetCut(false);
+    const bool* CurrentKeyStates{
+      SDL_GetKeyboardState(nullptr)};
+    SDL_Scancode Scancode{SDL_GetScancodeFromKey(SDLK_C, nullptr)};
+
+    if (!CurrentKeyStates[Scancode]) {
+      if (Cut) {
+        using namespace UserEvents;
+        SDL_Event E;
+        E.type = CUT;
+        E.user.data1 = static_cast<void*>(this);
+        SDL_PushEvent(&E);
+      }
+
+      SetCut(false);
+    }
     directions.push_back(WallPtr->GetPosition());
   }
   

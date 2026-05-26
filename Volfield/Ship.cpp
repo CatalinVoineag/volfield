@@ -32,6 +32,7 @@ Ship::Ship(
     5.f * Scene::PIXELS_PER_METER,
     static_cast<float>(Scene.GetBlitInfo()->DestRect.h + Height / 2)
   });
+  SetCenter();
 
   Input = AddComponent<InputComponent>();
   Input->UnbindKey(SDLK_SPACE);
@@ -54,6 +55,9 @@ Ship::Ship(
   Collision->SetOffset(
     Vec2{static_cast<float>((Width - Thickness) / 2), static_cast<float>((Height - Thickness) / 2) }
   );
+
+  ShipCollision = AddComponent<CollisionComponent>();
+  ShipCollision->SetSize(Width, Height);
   // Sound = AddComponent<SoundComponent>("Assets/ball_collision.wav");
 
   SetIsPaused(Paused);

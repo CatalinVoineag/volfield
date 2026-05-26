@@ -1,3 +1,4 @@
+#include <SDL3/SDL_surface.h>
 #include <format>
 #include <iostream>
 #include "VolfieldScene.h"
@@ -85,14 +86,16 @@ void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
   // if (ship->GetPath().size() > 0) {
   //   std::cout << ship->GetPath().back() << " this \n";
   // }
+  //
 
   SDL_Rect cut_rect = {
-    ship->GetTransform()->GetPosition().x,
-    ship->GetTransform()->GetPosition().y,
-    ship->GetTransform()->GetPosition().x,
-    Info->DestRect.h
+    static_cast<int>((ship->GetCenter().x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w),
+    static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
+    // Info->DestRect.w - ship->GetTransform()->GetPosition().x,
+    Info->SourceRect.w,
+    Info->SourceRect.h
   };
-  Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
 
+  Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
   SDL_FillSurfaceRect(BackgroundSurface.get(), &cut_rect, transparent);
 }

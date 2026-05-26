@@ -38,6 +38,7 @@ class Ship : public Entity {
       if (CurrentKeyStates[Scancode]) {
         SetCut(true);
       }
+      SetCenter();
     }
 
     void Render(SDL_Surface* Surface, float DeltaTime) {
@@ -59,13 +60,13 @@ class Ship : public Entity {
           };
 
           path.emplace_back(int(PositionIndicator.y)+4);
-          std::cout << "PATH " << path.back() << "\n";
+          // std::cout << "PATH " << path.back() << "\n";
           path.emplace_back(int(PositionIndicator.y)+3);
-          std::cout << "PATH " << path.back() << "\n";
+          // std::cout << "PATH " << path.back() << "\n";
           path.emplace_back(int(PositionIndicator.y)+2);
-          std::cout << "PATH " << path.back() << "\n";
+          // std::cout << "PATH " << path.back() << "\n";
           path.emplace_back(int(PositionIndicator.y)+1);
-          std::cout << "PATH " << path.back() << "\n";
+          // std::cout << "PATH " << path.back() << "\n";
 
           SDL_FillSurfaceRect(
             GetScene().Trajectories,
@@ -106,10 +107,30 @@ class Ship : public Entity {
       return Transform;
     }
 
+    int GetWidth() {
+      return Width;
+    }
+
+    int GetHeight() {
+      return Height;
+    }
+
+    void SetCenter() {
+      Center = {
+        GetTransform()->GetPosition().x + (GetWidth() / 2),
+        GetTransform()->GetPosition().y + (GetHeight() / 2)
+      };
+    }
+
+    Vec2 GetCenter() {
+      return Center;
+    }
+
   private:
     TransformComponent* Transform;
     ImageComponent* Image;
     CollisionComponent* Collision;
+    CollisionComponent* ShipCollision;
     PhysicsComponent* Physics;
     SoundComponent* Sound;
     InputComponent* Input{nullptr};
@@ -121,6 +142,7 @@ class Ship : public Entity {
     std::vector<WallPosition> directions;
     bool Cut = false;
     std::vector<int> path; 
+    Vec2 Center;
 
     bool MoveLeftOrRight() {
       if (Cut) { return true; }

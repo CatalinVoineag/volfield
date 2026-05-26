@@ -65,17 +65,17 @@ void PhysicsComponent::DrawDebugHelpers(
   SDL_Surface* Surface
 ) {
 #ifdef DRAW_DEBUG_HELPERS
-  // auto [x, y]{GetOwnerPosition()};
-  // SDL_Rect PositionIndicator{
-  //   int(x) - 2, int(y) - 2, 4, 4};
-  // SDL_FillSurfaceRect(
-  //   GetScene().Trajectories,
-  //   &PositionIndicator,
-  //   SDL_MapRGB(
-  //     SDL_GetPixelFormatDetails(
-  //       GetScene().Trajectories->format),
-  //     nullptr, 0, 0, 255
-  //   )
-  // );
+  auto [x, y]{GetOwnerPosition()};
+  SDL_Rect PositionIndicator{
+    int(x) - 2, int(y) - 2, 4, 4};
+  SDL_FillSurfaceRect(
+    GetScene().Trajectories,
+    &PositionIndicator,
+    SDL_MapRGB(
+      SDL_GetPixelFormatDetails(
+        GetScene().Trajectories->format),
+      nullptr, 0, 0, 255
+    )
+  );
 #endif
 }

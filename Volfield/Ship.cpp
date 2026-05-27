@@ -103,23 +103,16 @@ void Ship::HandleCollision(Entity& Other) {
   Wall* WallPtr = dynamic_cast<Wall*>(&Other);
 
   if (WallPtr) {
-    const bool* CurrentKeyStates{
-      SDL_GetKeyboardState(nullptr)};
-    SDL_Scancode Scancode{SDL_GetScancodeFromKey(SDLK_C, nullptr)};
-
-    if (!CurrentKeyStates[Scancode]) {
-      if (Cut) {
-        using namespace UserEvents;
-        SDL_Event E;
-        E.type = CUT;
-        E.user.data1 = static_cast<void*>(this);
-        SDL_PushEvent(&E);
-      }
-
-      SetCut(false);
+    if (state == CUTTING) {
+      using namespace UserEvents;
+      SDL_Event E;
+      E.type = CUT;
+      E.user.data1 = static_cast<void*>(this);
+      SDL_PushEvent(&E);
+      SetState(SAFE);
     }
-    directions.push_back(WallPtr->GetPosition());
   }
+  directions.push_back(WallPtr->GetPosition());
   
   Vec2 CurrentPos{Transform->GetPosition()};
   if (IsVertical) {

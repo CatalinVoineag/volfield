@@ -15,6 +15,7 @@
 
 class VolfieldScene;
 enum Direction { UP, DOWN, LEFT, RIGHT };
+enum State { SAFE, ARMED, CUTTING };
 
 class Ship : public Entity {
   public:
@@ -36,7 +37,9 @@ class Ship : public Entity {
       SDL_Scancode Scancode{SDL_GetScancodeFromKey(SDLK_C, nullptr)};
 
       if (CurrentKeyStates[Scancode]) {
-        SetCut(true);
+        SetState(ARMED);
+      } else if (!CurrentKeyStates[Scancode] && state == ARMED) {
+        SetState(SAFE);
       }
       SetCenter();
     }
@@ -44,7 +47,8 @@ class Ship : public Entity {
     void Render(SDL_Surface* Surface, float DeltaTime) {
       // This should start drawing from the colision box
       // in the middle of the ship
-      if (PreviousXPosition.has_value() && Cut && directions.size() == 0) {
+      if (PreviousXPosition.has_value() && state != SAFE && directions.size() == 0) {
+        SetState(CUTTING);
         int DiffX = *PreviousXPosition - int(Transform->GetPosition().x);
         int DiffY = *PreviousYPosition - int(Transform->GetPosition().y);
 
@@ -95,10 +99,6 @@ class Ship : public Entity {
       direction = dir;
     }
 
-    void SetCut(bool cut) {
-      Cut = cut;
-    }
-
     std::vector<int> GetPath() {
       return path;
     }
@@ -126,6 +126,11 @@ class Ship : public Entity {
       return Center;
     }
 
+    void SetState(State NewState) {
+      if (state == CUTTING && NewState == ARMED) { return; }
+      state = NewState;
+    }
+
   private:
     TransformComponent* Transform;
     ImageComponent* Image;
@@ -137,15 +142,15 @@ class Ship : public Entity {
     std::optional<int> PreviousXPosition;
     std::optional<int> PreviousYPosition;
     Direction direction = UP;
+    State state = SAFE;
     int Width;
     int Height;
     std::vector<WallPosition> directions;
-    bool Cut = false;
     std::vector<int> path; 
     Vec2 Center;
 
     bool MoveLeftOrRight() {
-      if (Cut) { return true; }
+      if (state != SAFE) { return true; }
 
       for (auto w : directions) {
         if (w == WallPosition::Top || w == WallPosition::Bottom)
@@ -155,7 +160,7 @@ class Ship : public Entity {
     }
 
     bool MoveUpOrDown() {
-      if (Cut) { return true; }
+      if (state != SAFE) { return true; }
 
       for (auto w : directions) {
         if (w == WallPosition::Left || w == WallPosition::Right)

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <optional>
 #include <vector>
+#include <cmath>
 #include "../Engine/ECS/Entity.h"
 #include "../Engine/ECS/ImageComponent.h"
 #include "../Engine/ECS/SoundComponent.h"
@@ -14,7 +15,6 @@
 #include "Wall.h"
 
 class VolfieldScene;
-enum Direction { UP, DOWN, LEFT, RIGHT };
 enum State { SAFE, ARMED, CUTTING };
 
 class Ship : public Entity {
@@ -47,13 +47,13 @@ class Ship : public Entity {
     void Render(SDL_Surface* Surface, float DeltaTime) {
       // This should start drawing from the colision box
       // in the middle of the ship
-      if (PreviousXPosition.has_value() && state != SAFE && directions.size() == 0) {
+      if (state != SAFE && directions.size() == 0) {
         SetState(CUTTING);
-        int DiffX = *PreviousXPosition - int(Transform->GetPosition().x);
-        int DiffY = *PreviousYPosition - int(Transform->GetPosition().y);
+        int DiffX = PreviousXPosition.value_or(0) - int(Transform->GetPosition().x);
+        int DiffY = PreviousYPosition.value_or(0) - int(Transform->GetPosition().y);
 
-        int lines = std::max(abs(DiffX), abs(DiffY));
-        int iterations = (lines / 4) + 1;
+        int pixels = std::max(abs(DiffX), abs(DiffY));
+        int iterations = (pixels / 4) + 1;
 
         for(int i = 0; i <= iterations; i++) {
           float t = float(i) / iterations;
@@ -94,10 +94,6 @@ class Ship : public Entity {
 
     Ship& operator=(const Ship& Other) = delete;
     Ship(const Ship& Other) = delete;
-
-    void SetDirection(Direction dir) {
-      direction = dir;
-    }
 
     std::vector<int> GetPath() {
       return path;
@@ -141,7 +137,6 @@ class Ship : public Entity {
     InputComponent* Input{nullptr};
     std::optional<int> PreviousXPosition;
     std::optional<int> PreviousYPosition;
-    Direction direction = UP;
     State state = SAFE;
     int Width;
     int Height;
@@ -175,7 +170,6 @@ class Ship : public Entity {
     }
 
     CommandPtr CreateMoveLeftCommand() {
-      SetDirection(LEFT);
       using namespace Config::Volfield;
 
       Vec2 moveVector;
@@ -188,7 +182,6 @@ class Ship : public Entity {
       return std::make_unique<MovementCommand>(moveVector);
     }
     CommandPtr CreateMoveRightCommand() {
-      SetDirection(RIGHT);
       using namespace Config::Volfield;
 
 
@@ -201,7 +194,6 @@ class Ship : public Entity {
       return std::make_unique<MovementCommand>(moveVector);
     }
     CommandPtr CreateMoveUpCommand() {
-      SetDirection(UP);
       using namespace Config::Volfield;
 
       Vec2 moveVector;
@@ -214,7 +206,6 @@ class Ship : public Entity {
       return std::make_unique<MovementCommand>(moveVector);
     }
     CommandPtr CreateMoveDownCommand() {
-      SetDirection(DOWN);
       using namespace Config::Volfield;
 
       Vec2 moveVector;

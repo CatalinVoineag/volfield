@@ -111,8 +111,8 @@ void Ship::HandleCollision(Entity& Other) {
       SDL_PushEvent(&E);
       SetState(SAFE);
     }
+    directions.push_back(WallPtr->GetPosition());
   }
-  directions.push_back(WallPtr->GetPosition());
   
   Vec2 CurrentPos{Transform->GetPosition()};
   if (IsVertical) {

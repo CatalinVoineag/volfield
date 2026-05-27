@@ -93,7 +93,8 @@ void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
     static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
     // Info->DestRect.w - ship->GetTransform()->GetPosition().x,
     Info->SourceRect.w,
-    Info->SourceRect.h
+    Info->SourceRect.h,
+    // abs(ship->GetPath().front() - ship->GetPath().back())
   };
 
   Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);

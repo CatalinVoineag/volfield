@@ -53,11 +53,14 @@ Ship::Ship(
   float Thickness{.3f * Scene.PIXELS_PER_METER};
   Collision->SetSize(Thickness, Thickness);
   Collision->SetOffset(
-    Vec2{static_cast<float>((Width - Thickness) / 2), static_cast<float>((Height - Thickness) / 2) }
+    Vec2{
+      static_cast<float>((Width - Thickness) / 2),
+      static_cast<float>((Height - Thickness) / 2)
+    }
   );
 
-  ShipCollision = AddComponent<CollisionComponent>();
-  ShipCollision->SetSize(Width, Height);
+  // ShipCollision = AddComponent<CollisionComponent>();
+  // ShipCollision->SetSize(Width, Height);
   // Sound = AddComponent<SoundComponent>("Assets/ball_collision.wav");
 
   SetIsPaused(Paused);
@@ -110,6 +113,17 @@ void Ship::HandleCollision(Entity& Other) {
       E.user.data1 = static_cast<void*>(this);
       SDL_PushEvent(&E);
       SetState(SAFE);
+
+      SDL_FillSurfaceRect(
+        GetScene().Trajectories,
+        nullptr,
+        SDL_MapRGBA(
+          SDL_GetPixelFormatDetails(
+            GetScene().Trajectories->format
+          ),
+          nullptr, 0, 0, 0, 0
+        )
+      );
     }
     directions.push_back(WallPtr->GetPosition());
   }

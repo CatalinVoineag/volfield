@@ -63,14 +63,10 @@ class Ship : public Entity {
               4, 4
           };
 
-          path.emplace_back(int(PositionIndicator.y)+4);
-          // std::cout << "PATH " << path.back() << "\n";
-          path.emplace_back(int(PositionIndicator.y)+3);
-          // std::cout << "PATH " << path.back() << "\n";
-          path.emplace_back(int(PositionIndicator.y)+2);
-          // std::cout << "PATH " << path.back() << "\n";
-          path.emplace_back(int(PositionIndicator.y)+1);
-          // std::cout << "PATH " << path.back() << "\n";
+          path.emplace_back(Vec2{float(PositionIndicator.x + 4), float(PositionIndicator.y + 4) });
+          path.emplace_back(Vec2{float(PositionIndicator.x + 3), float(PositionIndicator.y + 3) });
+          path.emplace_back(Vec2{float(PositionIndicator.x + 2), float(PositionIndicator.y + 2) });
+          path.emplace_back(Vec2{float(PositionIndicator.x + 1), float(PositionIndicator.y + 1) });
 
           SDL_FillSurfaceRect(
             GetScene().Trajectories,
@@ -95,7 +91,7 @@ class Ship : public Entity {
     Ship& operator=(const Ship& Other) = delete;
     Ship(const Ship& Other) = delete;
 
-    std::vector<int> GetPath() {
+    std::vector<Vec2> GetPath() {
       return path;
     }
 
@@ -141,7 +137,7 @@ class Ship : public Entity {
     int Width;
     int Height;
     std::vector<WallPosition> directions;
-    std::vector<int> path; 
+    std::vector<Vec2> path; 
     Vec2 Center;
 
     bool MoveLeftOrRight() {

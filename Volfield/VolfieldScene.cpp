@@ -92,25 +92,50 @@ void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
   std::cout << "MIDDLE " << middle << " ShipX" << ShipX << "\n";
   SDL_Rect cut_rect;
 
-  // This needs more work
-  for (const auto& path : ship->GetPath()) {
-    if (CutLeft) {
-      cut_rect = {
-        0,
-        static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
-        static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
-        static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h,
-      };
-    } else {
-      cut_rect = {
-        static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
-        static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
-        static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
-        static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h,
-      };
-    }
 
-    Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
-    SDL_FillSurfaceRect(BackgroundSurface.get(), &cut_rect, transparent);
-  }
+//   The scanline approach I described still uses SDL_FillSurfaceRect — just called once per row instead of once for the whole shape:
+// for each row Y between path_min_y and path_max_y:
+//     compute rightmost_x for that row
+//     SDL_FillSurfaceRect(surface, &SDL_Rect{0, Y, rightmost_x, 1}, transparent);
+// Each fill is a 1-pixel-tall rect from the left edge to the path boundary. That's all standard SDL — no special method needed.
+//
+  // Use fill algorithm
+  // fill both sides and cut the smallest
+  // This only works if the line does devide both fills and it cannot spill
+  // quick win is to make the line longer, just to test the algorithm?
+  // for (const auto& path : ship->GetPath()) {
+  //   // int Y = static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h;
+  //   // int X = static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w;
+  //   // Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
+  //   // SDL_Rect rect = {0, Y, X, 1};
+  //   // SDL_FillSurfaceRect(BackgroundSurface.get(), &rect, transparent);
+  //   // SDL_WriteSurfacePixels
+  //
+  //   SDL_WriteSurfacePixel(BackgroundSurface.get(), path.x, path.y, 255, 0, 0, 1);
+  // }
+
+
+  // This needs more work
+  // for (const auto& path : ship->GetPath()) {
+  //   if (CutLeft) {
+  //     cut_rect = {
+  //       0,
+  //       static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
+  //
+  //       static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
+  //       static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h,
+  //     };
+  //     std::cout << "CUT Y " << cut_rect.y << " CUT W " << cut_rect.w << " CUT H " << cut_rect.h << "\n";
+  //   } else {
+  //     cut_rect = {
+  //       static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
+  //       static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
+  //       static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
+  //       static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h,
+  //     };
+  //   }
+  //
+  //   Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
+  //   SDL_FillSurfaceRect(BackgroundSurface.get(), &cut_rect, transparent);
+  // }
 }

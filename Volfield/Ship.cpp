@@ -1,21 +1,5 @@
 #include "../Engine/Vec2.h"
-#include "VolfieldScene.h"
 #include "Ship.h"
-
-std::ostream& operator<<(std::ostream& os, WallPosition position) {
-    switch (position) {
-        case WallPosition::Top:
-            return os << "Top";
-        case WallPosition::Bottom:
-            return os << "Bottom";
-        case WallPosition::Left:
-            return os << "Left";
-        case WallPosition::Right:
-            return os << "Right";
-    }
-
-    return os << "Unknown";
-}
 
 Ship::Ship(
     VolfieldScene& Scene,
@@ -50,7 +34,7 @@ Ship::Ship(
   );
 
   Collision = AddComponent<CollisionComponent>();
-  float Thickness{.3f * Scene.PIXELS_PER_METER};
+  float Thickness{1};
   Collision->SetSize(Thickness, Thickness);
   Collision->SetOffset(
     Vec2{
@@ -114,34 +98,32 @@ void Ship::HandleCollision(Entity& Other) {
       SDL_PushEvent(&E);
       SetState(SAFE);
 
-      SDL_FillSurfaceRect(
-        GetScene().Trajectories,
-        nullptr,
-        SDL_MapRGBA(
-          SDL_GetPixelFormatDetails(
-            GetScene().Trajectories->format
-          ),
-          nullptr, 0, 0, 0, 0
-        )
-      );
+      // SDL_FillSurfaceRect(
+      //   GetScene().Trajectories,
+      //   nullptr,
+      //   SDL_MapRGBA(
+      //     SDL_GetPixelFormatDetails(
+      //       GetScene().Trajectories->format
+      //     ),
+      //     nullptr, 0, 0, 0, 0
+      //   )
+      // );
     }
     directions.push_back(WallPtr->GetPosition());
   }
   
   Vec2 CurrentPos{Transform->GetPosition()};
-  if (IsVertical) {
-    if (RelativePosition.y > 0) {
-      CurrentPos.y += Intersection.h;
-    } else {
-      CurrentPos.y -= Intersection.h;
-    }
-  } else {
-    if (RelativePosition.x > 0) {
-      CurrentPos.x += Intersection.w;
-    } else {
-      CurrentPos.x -= Intersection.w;
-    }
+  if (WallPtr->GetPosition() == WallPosition::Top) {
+    CurrentPos.y = WallPtr->GetEdge() - (Height / 2.f);
+  } else if (WallPtr->GetPosition() == WallPosition::Bottom) {
+    CurrentPos.y = WallPtr->GetEdge() - (Height / 2.f);
+    // CurrentPos.y = 325.5;
+  } else if (WallPtr->GetPosition() == WallPosition::Left ) {
+    CurrentPos.x = WallPtr->GetEdge() + (Width / 2.f);
+  } else if (WallPtr->GetPosition() == WallPosition::Right) {
+    CurrentPos.x = WallPtr->GetEdge() - (Width / 2.f);
   }
+
   Transform->SetPosition(CurrentPos);
   Collision->RefreshBounds();
 }

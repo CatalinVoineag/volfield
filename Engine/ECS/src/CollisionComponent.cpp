@@ -57,9 +57,7 @@ const SDL_FRect& CollisionComponent::GetBounds() const {
   return Bounds;
 }
 
-bool CollisionComponent::IsCollidingWith(
-  const CollisionComponent& Other
-) const {
+bool CollisionComponent::IsCollidingWith(const CollisionComponent& Other) const {
   const SDL_FRect& A{GetBounds()};
   const SDL_FRect& B{Other.GetBounds()};
 

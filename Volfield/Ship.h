@@ -30,7 +30,16 @@ class Ship : public Entity {
     void Tick(float DeltaTime) override {
       Entity::Tick(DeltaTime);
       Physics->SetVelocity({0, 0});
+
+      if (directions.size() == 1) {
+        std::cout  << "DIRECTIOn " << directions.front() << "\n";
+      } else if (directions.size() == 2) {
+        std::cout  << "DIRECTIOn break\n\n";
+        std::cout  << "DIRECTIOn " << directions.front() << "\n";
+        std::cout  << "DIRECTIOn " << directions.back() << "\n";
+      }
       directions.clear();
+
 
       const bool* CurrentKeyStates{
         SDL_GetKeyboardState(nullptr)};
@@ -53,20 +62,17 @@ class Ship : public Entity {
         int DiffY = PreviousYPosition.value_or(0) - int(Transform->GetPosition().y);
 
         int pixels = std::max(abs(DiffX), abs(DiffY));
-        int iterations = (pixels / 4) + 1;
+        int iterations = pixels + 1;
 
         for(int i = 0; i <= iterations; i++) {
           float t = float(i) / iterations;
           SDL_Rect PositionIndicator{
             int(*PreviousXPosition - DiffX * t + Width / 2),
               int(*PreviousYPosition - DiffY * t + Height / 2),
-              4, 4
+              1, 1
           };
 
-          path.emplace_back(Vec2{float(PositionIndicator.x + 4), float(PositionIndicator.y + 4) });
-          path.emplace_back(Vec2{float(PositionIndicator.x + 3), float(PositionIndicator.y + 3) });
-          path.emplace_back(Vec2{float(PositionIndicator.x + 2), float(PositionIndicator.y + 2) });
-          path.emplace_back(Vec2{float(PositionIndicator.x + 1), float(PositionIndicator.y + 1) });
+          path.emplace_back(Vec2{float(PositionIndicator.x), float(PositionIndicator.y) });
 
           SDL_FillSurfaceRect(
             GetScene().Trajectories,
@@ -107,13 +113,14 @@ class Ship : public Entity {
       return Height;
     }
 
+    // Probably should remove this
     void SetCenter() {
       Center = {
         GetTransform()->GetPosition().x + (GetWidth() / 2),
         GetTransform()->GetPosition().y + (GetHeight() / 2)
       };
     }
-
+    // Probably should remove this
     Vec2 GetCenter() {
       return Center;
     }
@@ -121,6 +128,10 @@ class Ship : public Entity {
     void SetState(State NewState) {
       if (state == CUTTING && NewState == ARMED) { return; }
       state = NewState;
+    }
+
+    State GetState() {
+      return state;
     }
 
   private:

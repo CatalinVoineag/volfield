@@ -91,6 +91,7 @@ void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
   };
   std::cout << "MIDDLE " << middle << " ShipX" << ShipX << "\n";
   SDL_Rect cut_rect;
+  ship->ClearPath();
 
 
 //   The scanline approach I described still uses SDL_FillSurfaceRect — just called once per row instead of once for the whole shape:

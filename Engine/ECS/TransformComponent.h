@@ -22,14 +22,14 @@ class TransformComponent : public Component {
   }
 
   void DrawDebugHelpers(SDL_Surface* S) override {
-    auto [x, y]{Position};
-    SDL_Rect Square{Utilities::Round({
-      x - 10, y - 10, 20, 20
-    })};
-    SDL_FillSurfaceRect(S, &Square, SDL_MapRGB(
-      SDL_GetPixelFormatDetails(S->format),
-      nullptr, 255, 0, 0)
-    );
+    // auto [x, y]{Position};
+    // SDL_Rect Square{Utilities::Round({
+    //   x - 10, y - 10, 20, 20
+    // })};
+    // SDL_FillSurfaceRect(S, &Square, SDL_MapRGB(
+    //   SDL_GetPixelFormatDetails(S->format),
+    //   nullptr, 255, 0, 0)
+    // );
   }
 
  private:

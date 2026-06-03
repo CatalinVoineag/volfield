@@ -52,7 +52,7 @@ class Wall : public Entity {
         Collision->SetSize(Width, Thickness);
       } else if (Position == Left) {
         Transform->SetPosition({X - Thickness, Y});
-        SetEdge(X - Thickness);
+        SetEdge(X);
         Collision->SetSize(Thickness, Height);
       } else if (Position == Right) {
         Transform->SetPosition({X + Width, Y});

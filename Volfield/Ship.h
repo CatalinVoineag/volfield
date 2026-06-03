@@ -40,7 +40,6 @@ class Ship : public Entity {
       }
       directions.clear();
 
-
       const bool* CurrentKeyStates{
         SDL_GetKeyboardState(nullptr)};
       SDL_Scancode Scancode{SDL_GetScancodeFromKey(SDLK_C, nullptr)};
@@ -67,9 +66,9 @@ class Ship : public Entity {
         for(int i = 0; i <= iterations; i++) {
           float t = float(i) / iterations;
           SDL_Rect PositionIndicator{
-            int(*PreviousXPosition - DiffX * t + Width / 2),
-              int(*PreviousYPosition - DiffY * t + Height / 2),
-              1, 1
+            int(*PreviousXPosition - DiffX * t + Width / 2.f),
+            int(*PreviousYPosition - DiffY * t + Height / 2.f),
+            1, 1
           };
 
           path.emplace_back(Vec2{float(PositionIndicator.x), float(PositionIndicator.y) });
@@ -99,6 +98,10 @@ class Ship : public Entity {
 
     std::vector<Vec2> GetPath() {
       return path;
+    }
+
+    void ClearPath() {
+      path.clear();
     }
 
     TransformComponent* GetTransform() {

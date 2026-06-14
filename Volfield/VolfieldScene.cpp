@@ -1,5 +1,4 @@
 #include <SDL3/SDL_surface.h>
-#include <format>
 #include <iostream>
 #include "VolfieldScene.h"
 #include "Ship.h"
@@ -13,7 +12,6 @@ void VolfieldScene::Load(int Level, Window& ParentWindow) {
   LeftSide = new LeftSideScene{ ParentWindow, 100, ParentWindow.GetSurface()->h, Header->GetHeight() };
   RightSide = new RightSideScene{ ParentWindow, 100, ParentWindow.GetSurface()->h, Header->GetHeight() };
   Footer = new FooterScene{ ParentWindow, ParentWindow.GetSurface()->w, 100 };
-
 
   int SurfaceW = ParentWindow.GetSurface()->w - LeftSide->GetWidth() * 2;
   int SurfaceH = ParentWindow.GetSurface()->h - Header->GetHeight();
@@ -83,60 +81,89 @@ void VolfieldScene::Load(int Level, Window& ParentWindow) {
 
 void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
   Ship* ship = static_cast<Ship*>(E.user.data1);
+  std::vector<bool> boolMap(Info->DestRect.w * Info->DestRect.h, false); 
 
-  float ShipX = static_cast<int>((ship->GetCenter().x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w);
-  int middle = Info->SourceRect.w / 2;
-  bool CutLeft{
-    ShipX < middle
-  };
-  std::cout << "MIDDLE " << middle << " ShipX" << ShipX << "\n";
-  SDL_Rect cut_rect;
+  std::vector<IntVec2> LeftSide;
+  DFS(
+    Info->DestRect.x, // Start 0
+    Info->DestRect.x, // Min
+    Info->DestRect.w + Info->DestRect.x, // MaxX
+    Info->DestRect.y, // Start 0
+    Info->DestRect.y, // Min
+    Info->DestRect.h + Info->DestRect.y, // MaxY
+    Info->DestRect.w, // Width
+    Trajectories, 
+    LeftSide,
+    boolMap
+   );
+
+  std::vector<IntVec2> RightSide;
+
+  DFS(
+    (Info->DestRect.w + Info->DestRect.x - 1), // Start right side
+    Info->DestRect.x, // Min 
+    Info->DestRect.w + Info->DestRect.x, // MaxX
+    (Info->DestRect.h + Info->DestRect.y - 1), // Start bottom side
+    Info->DestRect.y, // Min
+    Info->DestRect.h + Info->DestRect.y, // MaxY
+    Info->DestRect.w, // Width
+    Trajectories,
+    RightSide,
+    boolMap
+   );
+
+  if (RightSide.size() < LeftSide.size()) {
+    for (auto vec2 : RightSide) {
+      SDL_WriteSurfacePixel(Trajectories, vec2.x, vec2.y, 255, 0, 0, 255);
+    }
+  } else {
+    for (auto vec2 : LeftSide) {
+      SDL_WriteSurfacePixel(Trajectories, vec2.x, vec2.y, 255, 0, 0, 255);
+    }
+  }
+
   ship->ClearPath();
+}
+
+void VolfieldScene::DFS(
+  int X,
+  int MinX,
+  int MaxX,
+  int Y,
+  int MinY,
+  int MaxY,
+  int Width,
+  SDL_Surface* surface,
+  std::vector<IntVec2> &pixelsToFill,
+  std::vector<bool> &boolMap
+) {
+  if (X < MinX || X >= MaxX || Y < MinY || Y >= MaxY) { 
+    return;
+  }
+
+  Uint8 r, g, b, a;
+  SDL_ReadSurfacePixel(surface, X, Y, &r, &g, &b, &a);
+  bool red = r == 255 && g == 0 && b == 0;
+  if (red) { 
+    return;
+  }
+
+  int boolMapIndex = (Y - MinY) * Width + (X - MinX);
+  bool visited = boolMap[boolMapIndex];
+  if (visited) { 
+    return;
+  }
 
 
-//   The scanline approach I described still uses SDL_FillSurfaceRect — just called once per row instead of once for the whole shape:
-// for each row Y between path_min_y and path_max_y:
-//     compute rightmost_x for that row
-//     SDL_FillSurfaceRect(surface, &SDL_Rect{0, Y, rightmost_x, 1}, transparent);
-// Each fill is a 1-pixel-tall rect from the left edge to the path boundary. That's all standard SDL — no special method needed.
-//
-  // Use fill algorithm
-  // fill both sides and cut the smallest
-  // This only works if the line does devide both fills and it cannot spill
-  // quick win is to make the line longer, just to test the algorithm?
-  // for (const auto& path : ship->GetPath()) {
-  //   // int Y = static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h;
-  //   // int X = static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w;
-  //   // Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
-  //   // SDL_Rect rect = {0, Y, X, 1};
-  //   // SDL_FillSurfaceRect(BackgroundSurface.get(), &rect, transparent);
-  //   // SDL_WriteSurfacePixels
-  //
-  //   SDL_WriteSurfacePixel(BackgroundSurface.get(), path.x, path.y, 255, 0, 0, 1);
-  // }
+  // - Queue (BFS): spreads evenly in all directions like ripples in water
+  // This works fine but if the ship is at the edge, you'll get stack overflow.
+  // The recursive nature of the function is too deep. It has too many calls to
+  // figure out what to cut
+  boolMap[boolMapIndex] = true;
+  pixelsToFill.emplace_back(IntVec2{X, Y});
 
-
-  // This needs more work
-  // for (const auto& path : ship->GetPath()) {
-  //   if (CutLeft) {
-  //     cut_rect = {
-  //       0,
-  //       static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
-  //
-  //       static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
-  //       static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h,
-  //     };
-  //     std::cout << "CUT Y " << cut_rect.y << " CUT W " << cut_rect.w << " CUT H " << cut_rect.h << "\n";
-  //   } else {
-  //     cut_rect = {
-  //       static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
-  //       static_cast<int>((ship->GetCenter().y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h),
-  //       static_cast<int>(path.x - Info->DestRect.x) * Info->SourceRect.w / Info->DestRect.w,
-  //       static_cast<int>(path.y - Info->DestRect.y) * Info->SourceRect.h / Info->DestRect.h,
-  //     };
-  //   }
-  //
-  //   Uint32 transparent = SDL_MapSurfaceRGBA(BackgroundSurface.get(), 0, 0, 0, 0);
-  //   SDL_FillSurfaceRect(BackgroundSurface.get(), &cut_rect, transparent);
-  // }
+  DFS(X+1, MinX, MaxX, Y, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
+  DFS(X-1, MinX, MaxX, Y, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
+  DFS(X, MinX, MaxX, Y+1, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
+  DFS(X, MinX, MaxX, Y-1, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
 }

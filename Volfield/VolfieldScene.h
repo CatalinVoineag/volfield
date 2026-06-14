@@ -4,6 +4,7 @@
 #include "../Engine/Scene.h"
 #include "../Engine/ECS/SoundComponent.h"
 #include "../Engine/Vec2.h"
+#include "../Engine/IntVec2.h"
 #include "../Engine/Blit.h"
 #include "HeaderScene.h"
 #include "LeftSideScene.h"
@@ -84,6 +85,19 @@ public:
   }
 
   void HandleCutEvent(const SDL_Event& E);
+
+  void DFS(
+    int X,
+    int MinX,
+    int MaxX,
+    int Y,
+    int MinY,
+    int MaxY,
+    int Width,
+    SDL_Surface* surface,
+    std::vector<IntVec2> &pixelsToFill,
+    std::vector<bool> &boolMap
+  );
 
 private:
   int LoadedLevel{1};

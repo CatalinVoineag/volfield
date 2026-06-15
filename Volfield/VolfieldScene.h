@@ -86,11 +86,11 @@ public:
 
   void HandleCutEvent(const SDL_Event& E);
 
-  void DFS(
-    int X,
+  void BFS(
+    int StartX,
     int MinX,
     int MaxX,
-    int Y,
+    int StartY,
     int MinY,
     int MaxY,
     int Width,

@@ -1,5 +1,6 @@
 #include <SDL3/SDL_surface.h>
 #include <iostream>
+#include <stack>
 #include "VolfieldScene.h"
 #include "Ship.h"
 #include "Wall.h"
@@ -84,7 +85,7 @@ void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
   std::vector<bool> boolMap(Info->DestRect.w * Info->DestRect.h, false); 
 
   std::vector<IntVec2> LeftSide;
-  DFS(
+  BFS(
     Info->DestRect.x, // Start 0
     Info->DestRect.x, // Min
     Info->DestRect.w + Info->DestRect.x, // MaxX
@@ -99,7 +100,7 @@ void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
 
   std::vector<IntVec2> RightSide;
 
-  DFS(
+  BFS(
     (Info->DestRect.w + Info->DestRect.x - 1), // Start right side
     Info->DestRect.x, // Min 
     Info->DestRect.w + Info->DestRect.x, // MaxX
@@ -125,11 +126,11 @@ void VolfieldScene::HandleCutEvent(const SDL_Event& E) {
   ship->ClearPath();
 }
 
-void VolfieldScene::DFS(
-  int X,
+void VolfieldScene::BFS(
+  int StartX,
   int MinX,
   int MaxX,
-  int Y,
+  int StartY,
   int MinY,
   int MaxY,
   int Width,
@@ -137,33 +138,37 @@ void VolfieldScene::DFS(
   std::vector<IntVec2> &pixelsToFill,
   std::vector<bool> &boolMap
 ) {
-  if (X < MinX || X >= MaxX || Y < MinY || Y >= MaxY) { 
-    return;
+  std::stack<IntVec2> st;
+  st.push(IntVec2{StartX, StartY});
+
+  while(!st.empty()) {
+    int x = st.top().x;
+    int y = st.top().y;
+    st.pop();
+
+    if (x < MinX || x >= MaxX || y < MinY || y >= MaxY) { 
+      continue;
+    }
+
+    Uint8 r, g, b, a;
+    SDL_ReadSurfacePixel(surface, x, y, &r, &g, &b, &a);
+    bool red = r == 255 && g == 0 && b == 0;
+    if (red) { 
+      continue;
+    }
+
+    int boolMapIndex = (y - MinY) * Width + (x - MinX);
+    bool visited = boolMap[boolMapIndex];
+    if (visited) { 
+      continue;
+    }
+
+    boolMap[boolMapIndex] = true;
+    pixelsToFill.emplace_back(IntVec2{x, y});
+
+    st.push(IntVec2{x+1, y});
+    st.push(IntVec2{x-1, y});
+    st.push(IntVec2{x, y+1});
+    st.push(IntVec2{x, y-1});
   }
-
-  Uint8 r, g, b, a;
-  SDL_ReadSurfacePixel(surface, X, Y, &r, &g, &b, &a);
-  bool red = r == 255 && g == 0 && b == 0;
-  if (red) { 
-    return;
-  }
-
-  int boolMapIndex = (Y - MinY) * Width + (X - MinX);
-  bool visited = boolMap[boolMapIndex];
-  if (visited) { 
-    return;
-  }
-
-
-  // - Queue (BFS): spreads evenly in all directions like ripples in water
-  // This works fine but if the ship is at the edge, you'll get stack overflow.
-  // The recursive nature of the function is too deep. It has too many calls to
-  // figure out what to cut
-  boolMap[boolMapIndex] = true;
-  pixelsToFill.emplace_back(IntVec2{X, Y});
-
-  DFS(X+1, MinX, MaxX, Y, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
-  DFS(X-1, MinX, MaxX, Y, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
-  DFS(X, MinX, MaxX, Y+1, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
-  DFS(X, MinX, MaxX, Y-1, MinY, MaxY, Width, surface, pixelsToFill, boolMap);
 }
